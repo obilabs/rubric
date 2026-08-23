@@ -42,6 +42,26 @@ NATIVE_FORMAT = "rubric-bundle/v1"
 LEGACY_FORMATS = {"examgenie-content-bundle/v1"}
 
 
+def _coerce_weight(weight) -> Optional[float]:
+    """Best-effort numeric domain weight.
+
+    Accepts an int/float, or a numeric string like ``"25"`` (a manifest hand-
+    edited so the weight is quoted). Returns None for anything non-numeric, so a
+    mistyped weight disables the over/under check for that domain rather than
+    crashing — booleans are treated as non-numeric on purpose (``true`` is not 1%).
+    """
+    if isinstance(weight, bool):
+        return None
+    if isinstance(weight, (int, float)):
+        return float(weight)
+    if isinstance(weight, str):
+        try:
+            return float(weight.strip())
+        except ValueError:
+            return None
+    return None
+
+
 @dataclass
 class DomainCoverage:
     """How one domain's actual question share compares to its blueprint weight."""
@@ -194,6 +214,13 @@ class Bundle:
                 continue
             total += 1
             domains = result.data.get("domains") or []
+            # A scalar `domains:` in frontmatter (e.g. `domains: Algebra`) parses
+            # to a string; iterating it directly would tally it character by
+            # character. Wrap non-list values so one domain counts once.
+            if isinstance(domains, str):
+                domains = [domains]
+            elif not isinstance(domains, list):
+                domains = []
             for name in domains:
                 counts[name] = counts.get(name, 0) + 1
 
@@ -211,7 +238,7 @@ class Bundle:
             rows.append(
                 DomainCoverage(
                     domain=name,
-                    target_weight=float(weight) if isinstance(weight, (int, float)) else None,
+                    target_weight=_coerce_weight(weight),
                     question_count=counts.get(name, 0),
                     actual_weight=pct(counts.get(name, 0)),
                     in_blueprint=True,

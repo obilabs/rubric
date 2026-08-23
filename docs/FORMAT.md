@@ -38,7 +38,7 @@ C. $5x + 8y$
 |---|---|---|
 | `type` | **yes** | One of the types in §3. Unknown types are a hard error. |
 | `domains` | no | List of domain names. Matched by name against a bundle blueprint. Default `[]`. |
-| `difficulty` | no | `EASY`, `MEDIUM`, or `HARD`. Anything else is a *warning*; the value falls back to `MEDIUM`. |
+| `difficulty` | no | `EASY`, `MEDIUM`, or `HARD`. Anything else is reported as a *warning* and normalized to `MEDIUM`, so `data['difficulty']` is always one of the three. |
 | `tags` | no | Free-form list of strings. Default `[]`. |
 | `explanation` | no | A whole-question explanation. Use YAML block scalar `|` for multi-line. Default `""`. |
 
@@ -106,6 +106,10 @@ A `>` line before any choice is a warning and is ignored.
 
 A `CASE_STUDY` sub-question is inferred as `MULTIPLE_SELECT` when it has more than one
 correct choice, otherwise `SINGLE_CHOICE`.
+
+`MULTIPLE_CHOICE` is validated by the same rules as `SINGLE_CHOICE`, but the parser
+does **not** rewrite the type string — a `MULTIPLE_CHOICE` input still reports
+`data['type'] == 'MULTIPLE_CHOICE'`. Prefer `SINGLE_CHOICE` in new content.
 
 ---
 

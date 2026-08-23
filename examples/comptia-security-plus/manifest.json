@@ -59,6 +59,6 @@
     "questions/security-operations-003.md"
   ],
   "generator": {
-    "note": "Hand-authored starter set — deliberately uneven: Security Architecture and Security Program Management have no questions yet, so `rubric blueprint` reports them as gaps. A full bank would be filled to the domain weights above."
+    "note": "AI-authored starter set — NOT real past exam questions. Deliberately uneven: Security Architecture and Security Program Management have no questions yet, so `rubric blueprint` reports them as gaps. Domain weights are CompTIA's published SY0-701 objectives, referenced descriptively. A full bank would be filled to those weights."
   }
 }
