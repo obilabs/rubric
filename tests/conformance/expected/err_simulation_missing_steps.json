@@ -1,0 +1,32 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "HARD",
+    "domains": [
+      "System Hardening"
+    ],
+    "explanation": "",
+    "question_data": {
+      "distractors": [
+        {
+          "rationale": null,
+          "text": "Do nothing"
+        }
+      ],
+      "steps": [],
+      "total_steps": 0
+    },
+    "question_text": "A simulation with no Steps section is an error.",
+    "tags": [],
+    "type": "SIMULATION"
+  },
+  "errors": [
+    {
+      "line": 0,
+      "message": "Missing '## Steps' section",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

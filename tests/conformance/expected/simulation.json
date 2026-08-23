@@ -1,0 +1,46 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "HARD",
+    "domains": [
+      "System Hardening"
+    ],
+    "explanation": "Order matters: snapshot, then change, then restart.\n",
+    "question_data": {
+      "distractors": [
+        {
+          "rationale": "Telnet is plaintext; opening it undoes the hardening.",
+          "text": "Open port 23 for Telnet"
+        },
+        {
+          "rationale": null,
+          "text": "Delete all user accounts"
+        }
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "rationale": "Always snapshot before changing a live service.",
+          "text": "Back up the current sshd_config"
+        },
+        {
+          "order": 2,
+          "rationale": null,
+          "text": "Set PasswordAuthentication to no"
+        },
+        {
+          "order": 3,
+          "rationale": null,
+          "text": "Restart the SSH daemon"
+        }
+      ],
+      "total_steps": 3
+    },
+    "question_text": "Harden the SSH server. Put the required steps in the correct order.",
+    "tags": [],
+    "type": "SIMULATION"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

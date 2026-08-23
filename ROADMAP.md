@@ -36,7 +36,8 @@ Still open here:
 - [ ] A GitHub Pages deployment once the repo is public (Actions is ready).
 - [ ] Render math (`$…$`) — today it's shown as source; a small KaTeX-free renderer, or
       an opt-in one, would finish the WAEC maths bank's presentation.
-- [ ] In-browser support for the reserved types once their parsers land (below).
+- [x] In-browser support for `DRAG_DROP` and `SIMULATION` (both are now answerable in
+      the playground, with the same rationale reveal and domain diagnosis).
 
 ## Content — more real banks
 
@@ -53,8 +54,10 @@ Every bundle is authored the same way, so this is additive and parallelizable.
 
 ## Format — finish the reserved types
 
-- [ ] `DRAG_DROP` — a real parser for the `DRAGGABLE` / `DROPZONES` / `PAIRS` syntax.
-- [ ] `SIMULATION` — task-sequence questions.
+- [x] `DRAG_DROP` — real parser for the `## Draggables` / `## Dropzones` / `## Pairs`
+      syntax, with per-pair rationale and reference validation. Rendered in the playground.
+- [x] `SIMULATION` — task-sequence questions: ordered `## Steps` + optional
+      `## Distractors`, with per-item rationale. Rendered in the playground.
 - [ ] `HOTSPOT` — validate that referenced images exist; richer region metadata.
 - [ ] Image references: alt-text and URL forms, and a resolver contract for renderers.
 

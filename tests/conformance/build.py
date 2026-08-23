@@ -241,29 +241,114 @@ Click on the firewall interface that is configured for the DMZ network.
 """,
     ),
     (
-        "drag_drop_stub",
+        "drag_drop",
         """---
 type: DRAG_DROP
-domains: [Security Architecture]
+domains: [Ports and Protocols]
+difficulty: MEDIUM
+explanation: |
+  These are the IANA well-known default ports.
+---
+
+# Question
+
+Match each protocol to the port it listens on by default.
+
+## Draggables
+
+- HTTP
+- HTTPS
+- SSH
+- DNS
+
+## Dropzones
+
+- 80
+- 443
+- 22
+- 53
+
+## Pairs
+
+- HTTP -> 80
+> Unencrypted web traffic uses port 80.
+- HTTPS -> 443
+> TLS-wrapped web traffic uses port 443.
+- SSH -> 22
+- DNS -> 53
+""",
+    ),
+    (
+        "err_drag_drop_unknown_ref",
+        """---
+type: DRAG_DROP
+domains: [Ports and Protocols]
 difficulty: MEDIUM
 ---
 
 # Question
 
-Match each control to its category.
+A pair that names a token not in the lists is an error.
+
+## Draggables
+
+- HTTP
+- SSH
+
+## Dropzones
+
+- 80
+- 22
+
+## Pairs
+
+- HTTP -> 80
+- FTP -> 22
 """,
     ),
     (
-        "simulation_stub",
+        "simulation",
         """---
 type: SIMULATION
-domains: [Security Operations]
+domains: [System Hardening]
+difficulty: HARD
+explanation: |
+  Order matters: snapshot, then change, then restart.
+---
+
+# Task
+
+Harden the SSH server. Put the required steps in the correct order.
+
+## Steps
+
+1. Back up the current sshd_config
+> Always snapshot before changing a live service.
+2. Set PasswordAuthentication to no
+3. Restart the SSH daemon
+
+## Distractors
+
+- Open port 23 for Telnet
+> Telnet is plaintext; opening it undoes the hardening.
+- Delete all user accounts
+""",
+    ),
+    (
+        "err_simulation_missing_steps",
+        """---
+type: SIMULATION
+domains: [System Hardening]
 difficulty: HARD
 ---
 
-# Question
+# Task
 
-Configure the firewall to allow only HTTPS.
+A simulation with no Steps section is an error.
+
+## Distractors
+
+- Do nothing
 """,
     ),
     (

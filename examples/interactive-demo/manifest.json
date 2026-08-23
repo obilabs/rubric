@@ -1,0 +1,42 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "Rubric",
+    "slug": "rubric",
+    "description": "Demonstration bank for Rubric's interactive question types"
+  },
+  "certification": {
+    "name": "Interactive Types Demo",
+    "code": "RUBRIC-DEMO",
+    "slug": "interactive-demo",
+    "description": "A small bank showcasing the DRAG_DROP and SIMULATION question types, with per-item rationale.",
+    "difficulty_level": "beginner",
+    "passing_score": 70
+  },
+  "domains": [
+    {
+      "name": "Ports and Protocols",
+      "weight": 50,
+      "order": 1,
+      "description": "well-known ports, transport protocols, matching services to ports"
+    },
+    {
+      "name": "System Hardening",
+      "weight": 50,
+      "order": 2,
+      "description": "ordered hardening procedures, secure defaults, incident sequences"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/ports-and-protocols-001.md",
+    "questions/ports-and-protocols-002.md",
+    "questions/system-hardening-001.md",
+    "questions/system-hardening-002.md"
+  ],
+  "generator": {
+    "note": "AI-authored demo content — NOT real exam questions. It exists to exercise the DRAG_DROP and SIMULATION parsers and to show both types rendered in the playground."
+  }
+}

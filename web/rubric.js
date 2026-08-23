@@ -561,31 +561,198 @@
     };
   }
 
+  // Parse a bulleted (-/*) or ordered (1.) list, sharing the per-item `>`
+  // rationale convention with parseChoices. Mirrors parser._parse_item_list.
+  function parseItemList(text, errors, warnings, ordered) {
+    var items = [];
+    var itemPattern = ordered ? /^\d+\.\s+([\s\S]*)$/ : /^[-*]\s+([\s\S]*)$/;
+    var lines = text.split("\n");
+    for (var idx = 0; idx < lines.length; idx++) {
+      var lineNum = idx + 1;
+      var line = strip(lines[idx]);
+      if (!line) continue;
+
+      if (line.charAt(0) === ">") {
+        var rationale = strip(line.replace(/^>+/, ""));
+        if (items.length === 0) {
+          warnings.push(
+            err(lineNum, "Rationale line '>' appears before any item", "warning")
+          );
+        } else if (rationale) {
+          var previous = items[items.length - 1].rationale;
+          items[items.length - 1].rationale = previous
+            ? previous + " " + rationale
+            : rationale;
+        }
+        continue;
+      }
+
+      var match = itemPattern.exec(line);
+      if (match) {
+        var itemText = parseImages(strip(match[1]));
+        if (ordered) {
+          items.push({ order: items.length + 1, text: itemText, rationale: null });
+        } else {
+          items.push({ text: itemText, rationale: null });
+        }
+      } else {
+        warnings.push(
+          err(
+            lineNum,
+            "Could not parse list item: '" + line.slice(0, 50) + "...'",
+            "warning"
+          )
+        );
+      }
+    }
+    return items;
+  }
+
+  // Extract a `## <section>` bulleted list into {id, text}. Mirrors
+  // parser._extract_labelled_list.
+  function extractLabelledList(content, section, prefix, errors, warnings) {
+    var re = new RegExp("##\\s+" + section + "\\s*\\n([\\s\\S]*?)(?=##|---|$)");
+    var m = re.exec(content);
+    if (!m) {
+      errors.push(
+        err(findLine(content, "## " + section), "Missing '## " + section + "' section")
+      );
+      return [];
+    }
+    var items = parseItemList(m[1], errors, warnings, false);
+    if (items.length === 0) {
+      errors.push(
+        err(
+          findLine(content, "## " + section),
+          "'## " + section + "' section has no items"
+        )
+      );
+    }
+    return items.map(function (it, i) {
+      return { id: prefix + (i + 1), text: it.text };
+    });
+  }
+
+  // Extract `## Pairs` (draggable -> dropzone) with reference validation.
+  // Mirrors parser._extract_pairs.
+  function extractPairs(content, draggables, dropzones, errors, warnings) {
+    var m = /##\s+Pairs\s*\n([\s\S]*?)(?=##|---|$)/.exec(content);
+    if (!m) {
+      errors.push(err(findLine(content, "## Pairs"), "Missing '## Pairs' section"));
+      return [];
+    }
+    var rawItems = parseItemList(m[1], errors, warnings, false);
+    if (rawItems.length === 0) {
+      errors.push(err(findLine(content, "## Pairs"), "'## Pairs' section has no items"));
+    }
+
+    var dragLabels = {};
+    draggables.forEach(function (d) {
+      dragLabels[d.text] = true;
+    });
+    var zoneLabels = {};
+    dropzones.forEach(function (z) {
+      zoneLabels[z.text] = true;
+    });
+
+    var pairs = [];
+    rawItems.forEach(function (it) {
+      var text = it.text;
+      var arrow = /^(.*?)\s*(?:->|→)\s*(.*)$/.exec(text);
+      if (!arrow) {
+        errors.push(
+          err(
+            findLine(content, text),
+            "Pair must be 'draggable -> dropzone': '" + text.slice(0, 50) + "'"
+          )
+        );
+        return;
+      }
+      var left = strip(arrow[1]);
+      var right = strip(arrow[2]);
+      if (!dragLabels[left]) {
+        errors.push(
+          err(findLine(content, text), "Pair references unknown draggable '" + left + "'")
+        );
+      }
+      if (!zoneLabels[right]) {
+        errors.push(
+          err(findLine(content, text), "Pair references unknown dropzone '" + right + "'")
+        );
+      }
+      pairs.push({ draggable: left, dropzone: right, rationale: it.rationale });
+    });
+    return pairs;
+  }
+
   function parseDragDropQuestion(content, frontmatter, errors, warnings) {
-    warnings.push(err(1, "DRAG_DROP parser not yet implemented", "warning"));
+    var questionText = "";
+    var qMatch = /#\s+Question\s*\n([\s\S]*?)(?=##|$)/.exec(content);
+    if (!qMatch) {
+      errors.push(err(findLine(content, "# Question"), "Missing '# Question' section"));
+    } else {
+      questionText = parseImages(strip(qMatch[1]));
+    }
+
+    var draggables = extractLabelledList(content, "Draggables", "d", errors, warnings);
+    var dropzones = extractLabelledList(content, "Dropzones", "z", errors, warnings);
+    var pairs = extractPairs(content, draggables, dropzones, errors, warnings);
+
     return {
       type: "DRAG_DROP",
       domains: get(frontmatter, "domains", []),
       difficulty: get(frontmatter, "difficulty", "MEDIUM"),
       tags: get(frontmatter, "tags", []),
-      question_text: "",
+      question_text: questionText,
       choices: [],
       explanation: get(frontmatter, "explanation", ""),
-      question_data: {},
+      question_data: {
+        draggables: draggables,
+        dropzones: dropzones,
+        pairs: pairs,
+      },
     };
   }
 
   function parseSimulationQuestion(content, frontmatter, errors, warnings) {
-    warnings.push(err(1, "SIMULATION parser not yet implemented", "warning"));
+    var taskText = "";
+    var tMatch = /#\s+Task\s*\n([\s\S]*?)(?=##|$)/.exec(content);
+    if (!tMatch) {
+      errors.push(err(findLine(content, "# Task"), "Missing '# Task' section"));
+    } else {
+      taskText = parseImages(strip(tMatch[1]));
+    }
+
+    var steps = [];
+    var stepsMatch = /##\s+Steps\s*\n([\s\S]*?)(?=##|---|$)/.exec(content);
+    if (!stepsMatch) {
+      errors.push(err(findLine(content, "## Steps"), "Missing '## Steps' section"));
+    } else {
+      steps = parseItemList(stepsMatch[1], errors, warnings, true);
+      if (steps.length === 0) {
+        errors.push(err(findLine(content, "## Steps"), "'## Steps' section has no steps"));
+      }
+    }
+
+    var distractors = [];
+    var distMatch = /##\s+Distractors\s*\n([\s\S]*?)(?=##|---|$)/.exec(content);
+    if (distMatch) {
+      distractors = parseItemList(distMatch[1], errors, warnings, false);
+    }
+
     return {
       type: "SIMULATION",
       domains: get(frontmatter, "domains", []),
       difficulty: get(frontmatter, "difficulty", "MEDIUM"),
       tags: get(frontmatter, "tags", []),
-      question_text: "",
+      question_text: taskText,
       choices: [],
       explanation: get(frontmatter, "explanation", ""),
-      question_data: {},
+      question_data: {
+        steps: steps,
+        distractors: distractors,
+        total_steps: steps.length,
+      },
     };
   }
 

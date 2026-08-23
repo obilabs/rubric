@@ -169,8 +169,9 @@ cd web && npm test    # JS ↔ Python parser + coverage parity (no dependencies)
 | `MULTIPLE_SELECT` | ✅ full |
 | `TRUE_FALSE` | ✅ full |
 | `CASE_STUDY` (scenario + nested sub-questions) | ✅ full |
+| `DRAG_DROP` (match draggables to dropzones, per-pair rationale) | ✅ full |
+| `SIMULATION` (ordered task-steps + distractors, per-step rationale) | ✅ full |
 | `HOTSPOT` (click-a-region, JSON coordinates) | ⚠️ parses; renderer is downstream |
-| `DRAG_DROP`, `SIMULATION` | 🚧 reserved — parse to a stub today |
 
 See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, and [`ROADMAP.md`](ROADMAP.md) for where this is going.
 
@@ -188,7 +189,7 @@ Rubric is domain-agnostic: the same format carries a West African secondary-scho
 
 ## Contributing
 
-Issues and PRs welcome. Because Rubric is Apache-2.0, contributions come in under the same license — no CLA needed. Good first contributions: a new example bundle for an exam you know, real parsers for the reserved `DRAG_DROP` / `SIMULATION` types, or GIFT/QTI import-export (see the roadmap). If you touch the parser, keep the Python reference and the JavaScript port in step — `tests/conformance/build.py` regenerates the shared corpus both are checked against.
+Issues and PRs welcome. Because Rubric is Apache-2.0, contributions come in under the same license — no CLA needed. Good first contributions: a new example bundle for an exam you know, GIFT/QTI import-export, or `HOTSPOT` image validation (see the roadmap). If you touch the parser, keep the Python reference and the JavaScript port in step — `tests/conformance/build.py` regenerates the shared corpus both are checked against.
 
 ## License
 

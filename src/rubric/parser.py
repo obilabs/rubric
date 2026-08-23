@@ -359,24 +359,53 @@ class QuestionDSLParser:
         errors: List[ParseError],
         warnings: List[ParseError]
     ) -> Dict[str, Any]:
-        """Parse DRAG_DROP question."""
+        """Parse DRAG_DROP question.
 
-        # TODO: Implement drag-drop parser
-        warnings.append(ParseError(
-            line=1,
-            message="DRAG_DROP parser not yet implemented",
-            severity="warning"
-        ))
+        A drag-drop question declares a set of ``## Draggables`` (the tokens you
+        drag), a set of ``## Dropzones`` (the targets), and the correct
+        ``## Pairs`` mapping ``draggable -> dropzone``. A pair may carry a ``>``
+        rationale line, so the teaching payload survives into this type too:
+        why a mapping is right, or which mis-pairing a learner would make.
+        """
+
+        # Extract question text (same as choice questions).
+        question_match = re.search(
+            r'#\s+Question\s*\n(.*?)(?=##|\Z)',
+            content,
+            re.DOTALL
+        )
+        if not question_match:
+            errors.append(ParseError(
+                line=self._find_line(content, "# Question"),
+                message="Missing '# Question' section"
+            ))
+            question_text = ""
+        else:
+            question_text = self._parse_images(question_match.group(1).strip())
+
+        draggables = self._extract_labelled_list(
+            content, "Draggables", "d", errors, warnings
+        )
+        dropzones = self._extract_labelled_list(
+            content, "Dropzones", "z", errors, warnings
+        )
+        pairs = self._extract_pairs(
+            content, draggables, dropzones, errors, warnings
+        )
 
         return {
             "type": "DRAG_DROP",
             "domains": frontmatter.get('domains', []),
             "difficulty": frontmatter.get('difficulty', 'MEDIUM'),
             "tags": frontmatter.get('tags', []),
-            "question_text": "",
+            "question_text": question_text,
             "choices": [],
             "explanation": frontmatter.get('explanation', ''),
-            "question_data": {}
+            "question_data": {
+                "draggables": draggables,
+                "dropzones": dropzones,
+                "pairs": pairs,
+            }
         }
 
     def _parse_case_study_question(
@@ -491,25 +520,240 @@ class QuestionDSLParser:
         errors: List[ParseError],
         warnings: List[ParseError]
     ) -> Dict[str, Any]:
-        """Parse SIMULATION question."""
+        """Parse SIMULATION question.
 
-        # TODO: Implement simulation parser
-        warnings.append(ParseError(
-            line=1,
-            message="SIMULATION parser not yet implemented",
-            severity="warning"
-        ))
+        A simulation is a task-sequence: a ``# Task`` prompt, an ordered
+        ``## Steps`` list that is the correct sequence (order is significant),
+        and an optional ``## Distractors`` list of wrong actions offered
+        alongside. Each step or distractor may carry a ``>`` rationale — why the
+        step matters, or why the distractor is a trap.
+        """
+
+        # Extract task text.
+        task_match = re.search(
+            r'#\s+Task\s*\n(.*?)(?=##|\Z)',
+            content,
+            re.DOTALL
+        )
+        if not task_match:
+            errors.append(ParseError(
+                line=self._find_line(content, "# Task"),
+                message="Missing '# Task' section"
+            ))
+            task_text = ""
+        else:
+            task_text = self._parse_images(task_match.group(1).strip())
+
+        steps: List[Dict[str, Any]] = []
+        steps_match = re.search(
+            r'##\s+Steps\s*\n(.*?)(?=##|---|\Z)',
+            content,
+            re.DOTALL
+        )
+        if not steps_match:
+            errors.append(ParseError(
+                line=self._find_line(content, "## Steps"),
+                message="Missing '## Steps' section"
+            ))
+        else:
+            steps = self._parse_item_list(
+                steps_match.group(1), errors, warnings, ordered=True
+            )
+            if not steps:
+                errors.append(ParseError(
+                    line=self._find_line(content, "## Steps"),
+                    message="'## Steps' section has no steps"
+                ))
+
+        distractors: List[Dict[str, Any]] = []
+        distractors_match = re.search(
+            r'##\s+Distractors\s*\n(.*?)(?=##|---|\Z)',
+            content,
+            re.DOTALL
+        )
+        if distractors_match:
+            distractors = self._parse_item_list(
+                distractors_match.group(1), errors, warnings, ordered=False
+            )
 
         return {
             "type": "SIMULATION",
             "domains": frontmatter.get('domains', []),
             "difficulty": frontmatter.get('difficulty', 'MEDIUM'),
             "tags": frontmatter.get('tags', []),
-            "question_text": "",
+            "question_text": task_text,
             "choices": [],
             "explanation": frontmatter.get('explanation', ''),
-            "question_data": {}
+            "question_data": {
+                "steps": steps,
+                "distractors": distractors,
+                "total_steps": len(steps),
+            }
         }
+
+    # ---- shared helpers for the interactive types --------------------------
+
+    def _parse_item_list(
+        self,
+        text: str,
+        errors: List[ParseError],
+        warnings: List[ParseError],
+        ordered: bool = False,
+    ) -> List[Dict[str, Any]]:
+        """Parse a bulleted (``-``/``*``) or ordered (``1.``) list.
+
+        Shares the per-item ``>`` rationale convention with ``_parse_choices``:
+        one or more ``>`` lines attach to the preceding item (joined by a
+        space); a ``>`` before any item is a warning and ignored. Ordered items
+        are numbered by appearance, not by the literal number written, so a
+        mis-numbered list still yields 1..N.
+        """
+        items: List[Dict[str, Any]] = []
+        item_pattern = r'^\d+\.\s+(.*)$' if ordered else r'^[-*]\s+(.*)$'
+
+        for line_num, raw in enumerate(text.split('\n'), 1):
+            line = raw.strip()
+            if not line:
+                continue
+
+            if line.startswith('>'):
+                rationale = line.lstrip('>').strip()
+                if not items:
+                    warnings.append(ParseError(
+                        line=line_num,
+                        message="Rationale line '>' appears before any item",
+                        severity="warning"
+                    ))
+                elif rationale:
+                    previous = items[-1].get("rationale")
+                    items[-1]["rationale"] = (
+                        f"{previous} {rationale}" if previous else rationale
+                    )
+                continue
+
+            match = re.match(item_pattern, line)
+            if match:
+                item_text = self._parse_images(match.group(1).strip())
+                if ordered:
+                    items.append({
+                        "order": len(items) + 1,
+                        "text": item_text,
+                        "rationale": None,
+                    })
+                else:
+                    items.append({"text": item_text, "rationale": None})
+            else:
+                warnings.append(ParseError(
+                    line=line_num,
+                    message=f"Could not parse list item: '{line[:50]}...'",
+                    severity="warning"
+                ))
+
+        return items
+
+    def _extract_labelled_list(
+        self,
+        content: str,
+        section: str,
+        prefix: str,
+        errors: List[ParseError],
+        warnings: List[ParseError],
+    ) -> List[Dict[str, Any]]:
+        """Extract a ``## <section>`` bulleted list into ``{id, text}`` items.
+
+        Missing section, or a present-but-empty one, is an error — a drag-drop
+        question with no draggables (or no dropzones) can't be answered. Ids are
+        assigned ``<prefix>1``.. in order, for renderers to reference.
+        """
+        match = re.search(
+            rf'##\s+{section}\s*\n(.*?)(?=##|---|\Z)',
+            content,
+            re.DOTALL
+        )
+        if not match:
+            errors.append(ParseError(
+                line=self._find_line(content, f"## {section}"),
+                message=f"Missing '## {section}' section"
+            ))
+            return []
+
+        items = self._parse_item_list(match.group(1), errors, warnings, ordered=False)
+        if not items:
+            errors.append(ParseError(
+                line=self._find_line(content, f"## {section}"),
+                message=f"'## {section}' section has no items"
+            ))
+
+        return [
+            {"id": f"{prefix}{i}", "text": it["text"]}
+            for i, it in enumerate(items, 1)
+        ]
+
+    def _extract_pairs(
+        self,
+        content: str,
+        draggables: List[Dict[str, Any]],
+        dropzones: List[Dict[str, Any]],
+        errors: List[ParseError],
+        warnings: List[ParseError],
+    ) -> List[Dict[str, Any]]:
+        """Extract ``## Pairs`` (``draggable -> dropzone``) with validation.
+
+        Each pair's two sides must reference a declared draggable and dropzone
+        (by exact label); an unknown reference is an error. A line with no arrow
+        is an error. Pairs keep their optional ``>`` rationale.
+        """
+        match = re.search(
+            r'##\s+Pairs\s*\n(.*?)(?=##|---|\Z)',
+            content,
+            re.DOTALL
+        )
+        if not match:
+            errors.append(ParseError(
+                line=self._find_line(content, "## Pairs"),
+                message="Missing '## Pairs' section"
+            ))
+            return []
+
+        raw_items = self._parse_item_list(match.group(1), errors, warnings, ordered=False)
+        if not raw_items:
+            errors.append(ParseError(
+                line=self._find_line(content, "## Pairs"),
+                message="'## Pairs' section has no items"
+            ))
+
+        drag_labels = {d["text"] for d in draggables}
+        zone_labels = {z["text"] for z in dropzones}
+
+        pairs: List[Dict[str, Any]] = []
+        for it in raw_items:
+            text = it["text"]
+            arrow = re.match(r'^(.*?)\s*(?:->|→)\s*(.*)$', text)
+            if not arrow:
+                errors.append(ParseError(
+                    line=self._find_line(content, text),
+                    message=f"Pair must be 'draggable -> dropzone': '{text[:50]}'"
+                ))
+                continue
+            left = arrow.group(1).strip()
+            right = arrow.group(2).strip()
+            if left not in drag_labels:
+                errors.append(ParseError(
+                    line=self._find_line(content, text),
+                    message=f"Pair references unknown draggable '{left}'"
+                ))
+            if right not in zone_labels:
+                errors.append(ParseError(
+                    line=self._find_line(content, text),
+                    message=f"Pair references unknown dropzone '{right}'"
+                ))
+            pairs.append({
+                "draggable": left,
+                "dropzone": right,
+                "rationale": it["rationale"],
+            })
+
+        return pairs
 
     def _parse_images(self, text: str) -> str:
         """Parse [IMAGE: filename] references."""
