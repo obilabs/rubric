@@ -1,0 +1,12 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "line": 1,
+      "message": "Invalid DSL format: missing frontmatter delimiters (---)",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

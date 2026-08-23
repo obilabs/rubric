@@ -1,0 +1,38 @@
+[
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Cell Biology and Organisation",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 30.0,
+    "delta": 0.0,
+    "domain": "Plant and Animal Physiology",
+    "in_blueprint": true,
+    "question_count": 18,
+    "status": "ok",
+    "target_weight": 30.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Ecology",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 20.0,
+    "delta": 0.0,
+    "domain": "Genetics and Evolution",
+    "in_blueprint": true,
+    "question_count": 12,
+    "status": "ok",
+    "target_weight": 20.0
+  }
+]

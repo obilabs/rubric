@@ -1,0 +1,46 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": false,
+        "letter": "A",
+        "rationale": null,
+        "text": "The firewall is blocking HTTPS traffic"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "The DNS server is misconfigured"
+      },
+      {
+        "is_correct": true,
+        "letter": "C",
+        "rationale": null,
+        "text": "The default deny rule was applied"
+      },
+      {
+        "is_correct": false,
+        "letter": "D",
+        "rationale": null,
+        "text": "The routing table is incorrect"
+      }
+    ],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Security Operations",
+      "Network Security"
+    ],
+    "explanation": "The firewall default deny rule blocks all traffic unless explicitly allowed.\nThis is a security best practice.\n",
+    "question_data": {},
+    "question_text": "A security analyst notices that users cannot access the internet after a firewall update.\nWhich of the following is the MOST likely cause?\n\n[IMAGE: firewall-config]",
+    "tags": [
+      "firewall",
+      "networking"
+    ],
+    "type": "MULTIPLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

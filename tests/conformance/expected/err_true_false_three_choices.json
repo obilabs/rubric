@@ -1,0 +1,42 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "One"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "Two"
+      },
+      {
+        "is_correct": false,
+        "letter": "C",
+        "rationale": null,
+        "text": "Three"
+      }
+    ],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Test"
+    ],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "True/false must have exactly two choices.",
+    "tags": [],
+    "type": "TRUE_FALSE"
+  },
+  "errors": [
+    {
+      "line": 6,
+      "message": "TRUE_FALSE must have exactly 2 choices, found 3",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

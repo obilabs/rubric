@@ -1,0 +1,28 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Correct"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "Wrong"
+      }
+    ],
+    "difficulty": "EASY",
+    "domains": "Algebraic Processes",
+    "explanation": "",
+    "question_data": {},
+    "question_text": "A scalar domains value parses to a string, not a list.",
+    "tags": [],
+    "type": "SINGLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

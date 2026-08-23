@@ -128,6 +128,28 @@ At a glance: a learner drilling this bank would be blindsided on Security Archit
 
 ---
 
+## The playground
+
+[`web/`](web/) is a **fully static, zero-backend playground** for the format. Take a bank in the browser and, after you answer, it shows you two things the format is built for:
+
+- **the rationale for the option *you* picked** — not a generic "the answer was A," but why *your* answer was the misconception it was; and
+- **which domains to drill**, ranked by exam weight × how much you missed — scored against the same blueprint `rubric blueprint` checks.
+
+It runs entirely client-side, so it opens straight from `file://` and drops onto GitHub Pages with no server:
+
+```bash
+cd web
+python -m http.server 8099   # then open http://localhost:8099
+```
+
+The playground is powered by [`web/rubric.js`](web/rubric.js) — a **dependency-free JavaScript port** of the parser (and the coverage math), so there's nothing to install and no backend to host. A second implementation of one grammar could drift silently from the reference, so it doesn't get to: [`tests/conformance/`](tests/conformance/) freezes a corpus of inputs and the golden output of the **Python** parser, and both a `pytest` suite and a Node suite ([`web/test/`](web/test/)) assert their parser reproduces it byte-for-byte. If the two ever disagree, CI goes red.
+
+```bash
+cd web && npm test    # JS ↔ Python parser + coverage parity (no dependencies)
+```
+
+---
+
 ## What's in the box
 
 | Piece | Where | What it does |
@@ -135,6 +157,8 @@ At a glance: a learner drilling this bank would be blindsided on Security Archit
 | **Parser** | `rubric.QuestionDSLParser`, `rubric.validate_dsl` | Markdown+YAML → structured `dict`, with line-located errors and warnings |
 | **Bundle** | `rubric.Bundle` | Loads a manifest, validates its files, computes domain coverage vs. blueprint weights |
 | **CLI** | `rubric validate`, `rubric blueprint` | Lint banks and report syllabus coverage |
+| **Playground** | `web/` | Zero-backend browser page: take a bank, see per-choice rationale, get a domain-by-domain diagnosis |
+| **JS port** | `web/rubric.js` | Dependency-free JavaScript parser + coverage, kept byte-for-byte in step with the Python reference by a shared conformance corpus |
 | **Examples** | `examples/` | 360 WAEC questions across 7 subjects + a CompTIA Security+ starter — AI-generated seed content at enough volume to exercise the parser and the coverage tool |
 
 ### Question types
@@ -148,7 +172,7 @@ At a glance: a learner drilling this bank would be blindsided on Security Archit
 | `HOTSPOT` (click-a-region, JSON coordinates) | ⚠️ parses; renderer is downstream |
 | `DRAG_DROP`, `SIMULATION` | 🚧 reserved — parse to a stub today |
 
-See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, and [`ROADMAP.md`](ROADMAP.md) for where this is going (short version: an in-browser **playground** that renders a bank and shows a learner which *domains* to improve).
+See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, and [`ROADMAP.md`](ROADMAP.md) for where this is going.
 
 ---
 
@@ -164,7 +188,7 @@ Rubric is domain-agnostic: the same format carries a West African secondary-scho
 
 ## Contributing
 
-Issues and PRs welcome. Because Rubric is Apache-2.0, contributions come in under the same license — no CLA needed. Good first contributions: a new example bundle for an exam you know, a renderer, or a JS/WASM port of the parser (see the roadmap).
+Issues and PRs welcome. Because Rubric is Apache-2.0, contributions come in under the same license — no CLA needed. Good first contributions: a new example bundle for an exam you know, real parsers for the reserved `DRAG_DROP` / `SIMULATION` types, or GIFT/QTI import-export (see the roadmap). If you touch the parser, keep the Python reference and the JavaScript port in step — `tests/conformance/build.py` regenerates the shared corpus both are checked against.
 
 ## License
 

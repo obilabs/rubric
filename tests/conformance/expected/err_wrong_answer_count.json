@@ -1,0 +1,40 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Answer A"
+      },
+      {
+        "is_correct": true,
+        "letter": "B",
+        "rationale": null,
+        "text": "Answer B"
+      },
+      {
+        "is_correct": false,
+        "letter": "C",
+        "rationale": null,
+        "text": "Answer C"
+      }
+    ],
+    "difficulty": "MEDIUM",
+    "domains": [],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "Multiple choice with 2 correct answers",
+    "tags": [],
+    "type": "MULTIPLE_CHOICE"
+  },
+  "errors": [
+    {
+      "line": 5,
+      "message": "MULTIPLE_CHOICE must have exactly 1 correct answer, found 2",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

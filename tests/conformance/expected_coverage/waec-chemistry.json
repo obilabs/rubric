@@ -1,0 +1,38 @@
+[
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Atomic Structure and Bonding",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Physical Chemistry",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Inorganic Chemistry",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Organic Chemistry",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  }
+]

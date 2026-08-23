@@ -1,0 +1,38 @@
+[
+  {
+    "actual_weight": 100.0,
+    "delta": 75.0,
+    "domain": "Basic Economic Concepts and Tools",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "over",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 0.0,
+    "delta": -25.0,
+    "domain": "Markets, Demand and Supply",
+    "in_blueprint": true,
+    "question_count": 0,
+    "status": "uncovered",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 0.0,
+    "delta": -25.0,
+    "domain": "Money, Banking and Public Finance",
+    "in_blueprint": true,
+    "question_count": 0,
+    "status": "uncovered",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 0.0,
+    "delta": -25.0,
+    "domain": "The Nigerian and International Economy",
+    "in_blueprint": true,
+    "question_count": 0,
+    "status": "uncovered",
+    "target_weight": 25.0
+  }
+]

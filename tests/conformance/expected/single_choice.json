@@ -1,0 +1,42 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "To make data unreadable to unauthorized users"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "To compress data"
+      },
+      {
+        "is_correct": false,
+        "letter": "C",
+        "rationale": null,
+        "text": "To delete data"
+      },
+      {
+        "is_correct": false,
+        "letter": "D",
+        "rationale": null,
+        "text": "To backup data"
+      }
+    ],
+    "difficulty": "EASY",
+    "domains": [
+      "Security Fundamentals"
+    ],
+    "explanation": "Encryption converts plaintext to ciphertext using an algorithm and key.",
+    "question_data": {},
+    "question_text": "What is the primary purpose of encryption?",
+    "tags": [],
+    "type": "SINGLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

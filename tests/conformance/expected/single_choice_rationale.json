@@ -1,0 +1,45 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": "(3 / 5) * 200 = 120. \"Three-fifths of 200\" is the fraction times the whole.",
+        "text": "120"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": "This is one-fifth of 200. You found the size of one part but forgot to multiply by the 3 parts the numerator asks for.",
+        "text": "40"
+      },
+      {
+        "is_correct": false,
+        "letter": "C",
+        "rationale": "You divided 200 by 5 and then stopped.",
+        "text": "60"
+      },
+      {
+        "is_correct": false,
+        "letter": "D",
+        "rationale": "You divided by three-fifths instead of multiplying by it.",
+        "text": "333"
+      }
+    ],
+    "difficulty": "EASY",
+    "domains": [
+      "Number and Numeration"
+    ],
+    "explanation": "Three-fifths of 200 is (3 / 5) * 200 = 120. \"Of\" means multiply by the\nfraction; the whole (200) is what you take the fraction of.\n",
+    "question_data": {},
+    "question_text": "A farmer harvests 200 mangoes and sells three-fifths of them at the market.\nHow many mangoes does she sell?",
+    "tags": [
+      "fractions",
+      "word-problem"
+    ],
+    "type": "SINGLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

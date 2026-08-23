@@ -1,0 +1,49 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Confidentiality"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "Compliance"
+      },
+      {
+        "is_correct": true,
+        "letter": "C",
+        "rationale": null,
+        "text": "Integrity"
+      },
+      {
+        "is_correct": false,
+        "letter": "D",
+        "rationale": null,
+        "text": "Authorization"
+      },
+      {
+        "is_correct": false,
+        "letter": "E",
+        "rationale": null,
+        "text": "Availability"
+      }
+    ],
+    "correct_count": 2,
+    "difficulty": "EASY",
+    "domains": [
+      "Security Fundamentals"
+    ],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "Which of the following are components of the CIA triad? *(Select TWO)*",
+    "tags": [],
+    "type": "MULTIPLE_SELECT"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

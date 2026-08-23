@@ -1,0 +1,30 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Correct"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "Wrong"
+      }
+    ],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Test"
+    ],
+    "explanation": "This block scalar uses strip chomping.\nIt has no trailing newline.",
+    "question_data": {},
+    "question_text": "Strip-chomped block scalar.",
+    "tags": [],
+    "type": "SINGLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

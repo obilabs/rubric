@@ -1,0 +1,26 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Test"
+    ],
+    "explanation": null,
+    "question_data": {
+      "total_sub_questions": 0
+    },
+    "question_text": "This is a scenario with no sub-questions.",
+    "sub_questions": [],
+    "tags": [],
+    "type": "CASE_STUDY"
+  },
+  "errors": [
+    {
+      "line": 2,
+      "message": "Case study must have at least one sub-question",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

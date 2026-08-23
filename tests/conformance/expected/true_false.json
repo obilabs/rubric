@@ -1,0 +1,33 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "T",
+        "rationale": null,
+        "text": "TRUE"
+      },
+      {
+        "is_correct": false,
+        "letter": "F",
+        "rationale": null,
+        "text": "FALSE"
+      }
+    ],
+    "difficulty": "EASY",
+    "domains": [
+      "Security Fundamentals"
+    ],
+    "explanation": "HTTPS encrypts data in transit using TLS/SSL protocols.\n",
+    "question_data": {},
+    "question_text": "HTTPS provides encryption for data transmitted between a web browser and server.",
+    "tags": [
+      "encryption",
+      "https"
+    ],
+    "type": "TRUE_FALSE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

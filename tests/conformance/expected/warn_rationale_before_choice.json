@@ -1,0 +1,36 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Correct"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "Wrong"
+      }
+    ],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Test"
+    ],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "A rationale line before any choice is a warning.",
+    "tags": [],
+    "type": "SINGLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": [
+    {
+      "line": 1,
+      "message": "Rationale line '>' appears before any choice",
+      "severity": "warning"
+    }
+  ]
+}
