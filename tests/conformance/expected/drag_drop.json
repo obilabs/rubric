@@ -1,0 +1,76 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Ports and Protocols"
+    ],
+    "explanation": "These are the IANA well-known default ports.\n",
+    "question_data": {
+      "draggables": [
+        {
+          "id": "d1",
+          "text": "HTTP"
+        },
+        {
+          "id": "d2",
+          "text": "HTTPS"
+        },
+        {
+          "id": "d3",
+          "text": "SSH"
+        },
+        {
+          "id": "d4",
+          "text": "DNS"
+        }
+      ],
+      "dropzones": [
+        {
+          "id": "z1",
+          "text": "80"
+        },
+        {
+          "id": "z2",
+          "text": "443"
+        },
+        {
+          "id": "z3",
+          "text": "22"
+        },
+        {
+          "id": "z4",
+          "text": "53"
+        }
+      ],
+      "pairs": [
+        {
+          "draggable": "HTTP",
+          "dropzone": "80",
+          "rationale": "Unencrypted web traffic uses port 80."
+        },
+        {
+          "draggable": "HTTPS",
+          "dropzone": "443",
+          "rationale": "TLS-wrapped web traffic uses port 443."
+        },
+        {
+          "draggable": "SSH",
+          "dropzone": "22",
+          "rationale": null
+        },
+        {
+          "draggable": "DNS",
+          "dropzone": "53",
+          "rationale": null
+        }
+      ]
+    },
+    "question_text": "Match each protocol to the port it listens on by default.",
+    "tags": [],
+    "type": "DRAG_DROP"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

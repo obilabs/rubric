@@ -131,17 +131,5 @@ def test_invalid_difficulty_normalized_to_medium():
     assert result.data["difficulty"] == "MEDIUM"
 
 
-# ---- stub types carry the uniform shape ------------------------------------
-
-@pytest.mark.parametrize("qtype", ["DRAG_DROP", "SIMULATION"])
-def test_stub_types_include_tags_key(qtype):
-    """Fixed: stub result dicts include `tags` like every other type."""
-    dsl = f"---\ntype: {qtype}\ntags: [x, y]\ndomains: [D]\n---\n# Question\nq\n"
-    result = validate_dsl(dsl)
-    assert result.success is True  # stub emits a warning, not an error
-    assert "tags" in result.data
-    assert result.data["tags"] == ["x", "y"]
-
-
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

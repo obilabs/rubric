@@ -101,8 +101,8 @@ A `>` line before any choice is a warning and is ignored.
 | `TRUE_FALSE` | `# Question` + `## Choices` | exactly **2** choices |
 | `CASE_STUDY` | `# Scenario` + repeated `## Question N` (each with `### Choices`, optional `### Explanation`) | at least **1** sub-question |
 | `HOTSPOT` | `# Question` + a ` ```json ` block of `correctRegions` / `distractorRegions` | valid JSON |
-| `DRAG_DROP` | reserved | parses to a stub + warning |
-| `SIMULATION` | reserved | parses to a stub + warning |
+| `DRAG_DROP` | `# Question` + `## Draggables` + `## Dropzones` + `## Pairs` | each pair resolves to a declared draggable and dropzone |
+| `SIMULATION` | `# Task` + ordered `## Steps` (+ optional `## Distractors`) | at least **1** step; order is significant |
 
 A `CASE_STUDY` sub-question is inferred as `MULTIPLE_SELECT` when it has more than one
 correct choice, otherwise `SINGLE_CHOICE`.
@@ -110,6 +110,118 @@ correct choice, otherwise `SINGLE_CHOICE`.
 `MULTIPLE_CHOICE` is validated by the same rules as `SINGLE_CHOICE`, but the parser
 does **not** rewrite the type string — a `MULTIPLE_CHOICE` input still reports
 `data['type'] == 'MULTIPLE_CHOICE'`. Prefer `SINGLE_CHOICE` in new content.
+
+### DRAG_DROP
+
+A drag-drop question declares the tokens you drag, the targets you drop them on, and
+the correct mapping between them:
+
+```markdown
+---
+type: DRAG_DROP
+domains: [Ports and Protocols]
+---
+
+# Question
+
+Match each protocol to the port it listens on by default.
+
+## Draggables
+
+- HTTP
+- HTTPS
+- SSH
+
+## Dropzones
+
+- 80
+- 443
+- 22
+
+## Pairs
+
+- HTTP -> 80
+> Unencrypted web traffic uses port 80.
+- HTTPS -> 443
+- SSH -> 22
+```
+
+- **`## Draggables`** and **`## Dropzones`** are bulleted lists (`-` or `*`). Each is
+  required and must be non-empty. Items get ids `d1`, `d2`, … and `z1`, `z2`, … in order,
+  for renderers to reference.
+- **`## Pairs`** lists the correct mappings, one per line, as `draggable -> dropzone`
+  (`->` or the Unicode `→`). Each side must **exactly match** a declared draggable /
+  dropzone label — an unknown reference, or a line with no arrow, is an error. Labels
+  should be unique within a question so a pair resolves unambiguously.
+- A pair may carry a `>` **rationale** line, exactly like a choice — why the mapping is
+  right, or which mis-pairing it guards against.
+- Draggables not named in any pair are allowed (they act as distractors). A dropzone may
+  appear in more than one pair (bucketing).
+
+Parsed `question_data`:
+
+```python
+{
+  "draggables": [{"id": "d1", "text": "HTTP"}, ...],
+  "dropzones":  [{"id": "z1", "text": "80"}, ...],
+  "pairs": [
+    {"draggable": "HTTP", "dropzone": "80", "rationale": "Unencrypted web traffic..."},
+    {"draggable": "HTTPS", "dropzone": "443", "rationale": None},
+  ],
+}
+```
+
+### SIMULATION
+
+A simulation is a **task-sequence**: a task, the ordered steps that solve it, and
+optionally the wrong actions offered alongside them.
+
+```markdown
+---
+type: SIMULATION
+domains: [System Hardening]
+---
+
+# Task
+
+Harden the SSH server. Put the required steps in the correct order.
+
+## Steps
+
+1. Back up the current sshd_config
+> Snapshot before changing a live service.
+2. Set PasswordAuthentication to no
+3. Restart the SSH daemon
+
+## Distractors
+
+- Open port 23 for Telnet
+> Telnet is plaintext; opening it undoes the hardening.
+```
+
+- **`# Task`** is the prompt (note: `# Task`, not `# Question`). It becomes
+  `question_text`.
+- **`## Steps`** is an ordered list (`1.`, `2.`, …) whose **order is the correct
+  sequence**. At least one step is required. Steps are numbered by *appearance*, so a
+  mis-numbered list (`1.` `1.` `1.`) still yields `1, 2, 3`.
+- **`## Distractors`** is an optional bulleted list of wrong actions.
+- Any step or distractor may carry a `>` rationale.
+
+Parsed `question_data`:
+
+```python
+{
+  "steps": [
+    {"order": 1, "text": "Back up the current sshd_config", "rationale": "Snapshot..."},
+    {"order": 2, "text": "Set PasswordAuthentication to no", "rationale": None},
+    ...
+  ],
+  "distractors": [
+    {"text": "Open port 23 for Telnet", "rationale": "Telnet is plaintext..."},
+  ],
+  "total_steps": 3,
+}
+```
 
 ---
 

@@ -1,0 +1,56 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Ports and Protocols"
+    ],
+    "explanation": "",
+    "question_data": {
+      "draggables": [
+        {
+          "id": "d1",
+          "text": "HTTP"
+        },
+        {
+          "id": "d2",
+          "text": "SSH"
+        }
+      ],
+      "dropzones": [
+        {
+          "id": "z1",
+          "text": "80"
+        },
+        {
+          "id": "z2",
+          "text": "22"
+        }
+      ],
+      "pairs": [
+        {
+          "draggable": "HTTP",
+          "dropzone": "80",
+          "rationale": null
+        },
+        {
+          "draggable": "FTP",
+          "dropzone": "22",
+          "rationale": null
+        }
+      ]
+    },
+    "question_text": "A pair that names a token not in the lists is an error.",
+    "tags": [],
+    "type": "DRAG_DROP"
+  },
+  "errors": [
+    {
+      "line": 19,
+      "message": "Pair references unknown draggable 'FTP'",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

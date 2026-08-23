@@ -397,6 +397,80 @@
         color: var(--muted);
         margin-right: 4px;
       }
+      .rationale.trap {
+        border-left-color: var(--wrong-border);
+      }
+      .rationale.trap .lead {
+        color: var(--wrong);
+      }
+
+      /* ---- drag-drop & simulation (assign / order rows) ---- */
+      .order-intro {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0 0 12px;
+      }
+      .assign-row,
+      .order-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        background: var(--surface);
+      }
+      .assign-label {
+        font-weight: 600;
+        flex: 1 1 120px;
+        min-width: 0;
+      }
+      .assign-arrow {
+        color: var(--muted);
+        flex: none;
+      }
+      .order-num {
+        font-weight: 700;
+        color: var(--muted);
+        width: 22px;
+        flex: none;
+      }
+      .assign-select {
+        flex: 1 1 140px;
+        width: auto;
+        min-width: 0;
+      }
+      .assign-correct {
+        flex: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--correct);
+      }
+      .assign-row.correct,
+      .order-row.correct {
+        border-color: var(--correct-border);
+        background: var(--correct-bg);
+      }
+      .assign-row.chosen-wrong,
+      .order-row.chosen-wrong {
+        border-color: var(--wrong-border);
+        background: var(--wrong-bg);
+      }
+      .assign-row .mark,
+      .order-row .mark {
+        font-weight: 700;
+        flex: none;
+      }
+      .assign-row.correct .mark,
+      .order-row.correct .mark {
+        color: var(--correct);
+      }
+      .assign-row.chosen-wrong .mark,
+      .order-row.chosen-wrong .mark {
+        color: var(--wrong);
+      }
 
       .explain {
         margin-top: 18px;
@@ -694,7 +768,9 @@
           </div>
           <textarea id="dsl" spellcheck="false"></textarea>
           <div class="btn-row">
-            <button id="load-sample" class="btn secondary" type="button">Reset sample</button>
+            <button id="sample-choice" class="btn secondary" type="button">Single choice</button>
+            <button id="sample-dragdrop" class="btn secondary" type="button">Drag &amp; drop</button>
+            <button id="sample-sim" class="btn secondary" type="button">Simulation</button>
           </div>
         </div>
         <div class="card">
@@ -817,17 +893,29 @@
         function currentBank() {
           return BANKS[parseInt(bankSel.value, 10) || 0];
         }
+        function isAnswerable(d) {
+          if (Array.isArray(d.choices) && d.choices.length > 0) return true;
+          var qd = d.question_data || {};
+          if (d.type === "DRAG_DROP") {
+            return (
+              (qd.draggables || []).length &&
+              (qd.dropzones || []).length &&
+              (qd.pairs || []).length
+            );
+          }
+          if (d.type === "SIMULATION") return (qd.steps || []).length > 0;
+          return false;
+        }
         function parsedQuestions(bank) {
-          // Parse each question once; keep only successful choice-type questions.
+          // Parse each question once; keep every successfully-parsed, answerable
+          // question (choice types, drag-drop, and simulation).
           return bank.questions
             .map(function (q) {
               var res = R.parse(q.text);
               return res.success ? res.data : null;
             })
             .filter(Boolean)
-            .filter(function (d) {
-              return Array.isArray(d.choices) && d.choices.length > 0;
-            });
+            .filter(isAnswerable);
         }
         function provNote(bank) {
           var g = bank.manifest.generator || {};
@@ -919,6 +1007,19 @@
 
           qForm.innerHTML = "";
           qExplain.innerHTML = "";
+          if (data.type === "DRAG_DROP") renderDragDropForm(data);
+          else if (data.type === "SIMULATION") renderSimulationForm(data);
+          else renderChoiceForm(data);
+
+          submitBtn.classList.remove("hidden");
+          submitBtn.disabled = false;
+          nextBtn.classList.add("hidden");
+          nextBtn.textContent =
+            state.idx + 1 >= total ? "See my results →" : "Next →";
+        }
+
+        // ---- per-type form rendering ----
+        function renderChoiceForm(data) {
           var multi = isMulti(data);
           data.choices.forEach(function (c, i) {
             var lab = el("label", "choice");
@@ -934,22 +1035,85 @@
             lab.appendChild(t);
             qForm.appendChild(lab);
           });
-
-          submitBtn.classList.remove("hidden");
-          submitBtn.disabled = false;
-          nextBtn.classList.add("hidden");
-          nextBtn.textContent =
-            state.idx + 1 >= total ? "See my results →" : "Next →";
         }
 
-        submitBtn.onclick = function () {
-          var data = state.questions[state.idx];
-          var multi = isMulti(data);
+        function optionSelect(labels) {
+          var sel = document.createElement("select");
+          sel.className = "assign-select";
+          sel.appendChild(new Option("— choose —", ""));
+          labels.forEach(function (t) {
+            sel.appendChild(new Option(t, t)); // Option() sets text safely
+          });
+          return sel;
+        }
+
+        function renderDragDropForm(data) {
+          var qd = data.question_data;
+          var zoneLabels = qd.dropzones.map(function (z) {
+            return z.text;
+          });
+          var intro = el(
+            "p",
+            "order-intro",
+            "Assign each item to a target."
+          );
+          qForm.appendChild(intro);
+          qd.draggables.forEach(function (d) {
+            var row = el("div", "assign-row");
+            row.dataset.drag = d.text;
+            var lab = el("span", "assign-label");
+            lab.innerHTML = inlineFmt(d.text);
+            row.appendChild(lab);
+            row.appendChild(el("span", "assign-arrow", "→"));
+            row.appendChild(optionSelect(zoneLabels));
+            qForm.appendChild(row);
+          });
+        }
+
+        function renderSimulationForm(data) {
+          var qd = data.question_data;
+          var pool = qd.steps
+            .map(function (s) {
+              return s.text;
+            })
+            .concat(
+              (qd.distractors || []).map(function (x) {
+                return x.text;
+              })
+            );
+          shuffleInPlace(pool);
+          qForm.appendChild(
+            el(
+              "p",
+              "order-intro",
+              "Put the correct actions in order. Not every action belongs."
+            )
+          );
+          for (var i = 0; i < qd.steps.length; i++) {
+            var row = el("div", "order-row");
+            row.appendChild(el("span", "order-num", i + 1 + "."));
+            row.appendChild(optionSelect(pool));
+            qForm.appendChild(row);
+          }
+        }
+
+        // ---- per-type grading (locks the form, reveals rationale, returns
+        // {correct} — or null if nothing was answered) ----
+        function attachRationale(node, lead, text, tone) {
+          var r = el("div", "rationale" + (tone ? " " + tone : ""));
+          if (lead) r.appendChild(el("span", "lead", lead));
+          var body = el("span");
+          body.innerHTML = inlineFmt(text);
+          r.appendChild(body);
+          node.after(r);
+        }
+
+        function gradeChoice(data) {
           var picked = new Set();
           qForm.querySelectorAll("input").forEach(function (inp) {
             if (inp.checked) picked.add(parseInt(inp.value, 10));
           });
-          if (picked.size === 0) return; // require an answer
+          if (picked.size === 0) return null;
 
           var correctIdx = new Set();
           data.choices.forEach(function (c, i) {
@@ -957,16 +1121,13 @@
           });
           var isRight =
             picked.size === correctIdx.size &&
-            [].every.call(Array.from(picked), function (i) {
+            Array.from(picked).every(function (i) {
               return correctIdx.has(i);
             });
 
-          // lock + reveal
-          var labels = qForm.querySelectorAll(".choice");
-          labels.forEach(function (lab, i) {
+          qForm.querySelectorAll(".choice").forEach(function (lab, i) {
             lab.classList.add("locked");
-            var inp = lab.querySelector("input");
-            inp.disabled = true;
+            lab.querySelector("input").disabled = true;
             var c = data.choices[i];
             if (c.is_correct) {
               lab.classList.add("correct");
@@ -975,25 +1136,105 @@
               lab.classList.add("chosen-wrong");
               lab.appendChild(el("span", "mark", "✗"));
             }
-            // per-choice rationale (the differentiator) — show for the option the
-            // learner engaged with: their pick, and the correct answer.
             if (c.rationale && (picked.has(i) || c.is_correct)) {
-              var r = el("div", "rationale");
-              var lead = el("span", "lead", picked.has(i) ? "Your choice —" : "Correct —");
-              r.appendChild(lead);
-              var body = el("span");
-              body.innerHTML = inlineFmt(c.rationale);
-              r.appendChild(body);
-              lab.after(r);
+              attachRationale(lab, picked.has(i) ? "Your choice —" : "Correct —", c.rationale);
             }
           });
+          return { correct: isRight };
+        }
 
-          var verdict = el(
-            "p",
-            "verdict " + (isRight ? "ok" : "no"),
-            isRight ? "✓ Correct" : "✗ Not quite"
+        function gradeDragDrop(data) {
+          var qd = data.question_data;
+          var correctZone = {}; // draggable text -> correct dropzone ("" = none)
+          var rationaleFor = {};
+          qd.draggables.forEach(function (d) {
+            correctZone[d.text] = "";
+          });
+          qd.pairs.forEach(function (p) {
+            if (correctZone[p.draggable] === "") correctZone[p.draggable] = p.dropzone;
+            if (!(p.draggable in rationaleFor)) rationaleFor[p.draggable] = p.rationale;
+          });
+
+          var rows = qForm.querySelectorAll(".assign-row");
+          var answered = false;
+          rows.forEach(function (row) {
+            if (row.querySelector("select").value) answered = true;
+          });
+          if (!answered) return null;
+
+          var allCorrect = true;
+          rows.forEach(function (row) {
+            var drag = row.dataset.drag;
+            var sel = row.querySelector("select");
+            sel.disabled = true;
+            row.classList.add("locked");
+            var ok = sel.value === correctZone[drag];
+            if (!ok) allCorrect = false;
+            row.classList.add(ok ? "correct" : "chosen-wrong");
+            row.appendChild(el("span", "mark", ok ? "✓" : "✗"));
+            if (!ok) {
+              row.appendChild(
+                el(
+                  "span",
+                  "assign-correct",
+                  "→ " + (correctZone[drag] || "(leave unplaced)")
+                )
+              );
+            }
+            if (rationaleFor[drag]) attachRationale(row, null, rationaleFor[drag]);
+          });
+          return { correct: allCorrect };
+        }
+
+        function gradeSimulation(data) {
+          var qd = data.question_data;
+          var distractorRat = {};
+          (qd.distractors || []).forEach(function (x) {
+            distractorRat[x.text] = x.rationale;
+          });
+
+          var rows = qForm.querySelectorAll(".order-row");
+          var answered = false;
+          rows.forEach(function (row) {
+            if (row.querySelector("select").value) answered = true;
+          });
+          if (!answered) return null;
+
+          var allCorrect = true;
+          rows.forEach(function (row, i) {
+            var sel = row.querySelector("select");
+            sel.disabled = true;
+            row.classList.add("locked");
+            var correctText = qd.steps[i].text;
+            var ok = sel.value === correctText;
+            if (!ok) allCorrect = false;
+            row.classList.add(ok ? "correct" : "chosen-wrong");
+            row.appendChild(el("span", "mark", ok ? "✓" : "✗"));
+            if (!ok) row.appendChild(el("span", "assign-correct", "→ " + correctText));
+            if (qd.steps[i].rationale) attachRationale(row, "Step " + (i + 1) + " —", qd.steps[i].rationale);
+            // If the learner placed a distractor here, explain the trap.
+            if (!ok && distractorRat[sel.value]) {
+              attachRationale(row, "Trap —", distractorRat[sel.value], "trap");
+            }
+          });
+          return { correct: allCorrect };
+        }
+
+        submitBtn.onclick = function () {
+          var data = state.questions[state.idx];
+          var result;
+          if (data.type === "DRAG_DROP") result = gradeDragDrop(data);
+          else if (data.type === "SIMULATION") result = gradeSimulation(data);
+          else result = gradeChoice(data);
+          if (!result) return; // nothing answered
+
+          qExplain.appendChild(
+            el(
+              "p",
+              "verdict " + (result.correct ? "ok" : "no"),
+              result.correct ? "✓ Correct" : "✗ Not quite"
+            )
           );
-          qExplain.appendChild(verdict);
           if (data.explanation) {
             var ex = el("div", "explain");
             ex.appendChild(el("span", "lead", "Explanation"));
@@ -1003,7 +1244,7 @@
             qExplain.appendChild(ex);
           }
 
-          state.answered[state.idx] = { correct: isRight };
+          state.answered[state.idx] = { correct: result.correct };
           submitBtn.classList.add("hidden");
           nextBtn.classList.remove("hidden");
           qBar.style.width = pct(state.idx + 1, state.questions.length) + "%";
@@ -1282,15 +1523,83 @@
           "C. 333\n" +
           "> You divided by three-fifths instead of multiplying by it.\n";
 
+        var SAMPLE_DRAGDROP =
+          "---\n" +
+          "type: DRAG_DROP\n" +
+          "domains: [Ports and Protocols]\n" +
+          "difficulty: EASY\n" +
+          "explanation: |\n" +
+          "  IANA well-known ports: HTTP 80, HTTPS 443, SSH 22.\n" +
+          "---\n" +
+          "\n" +
+          "# Question\n" +
+          "\n" +
+          "Match each protocol to its default port.\n" +
+          "\n" +
+          "## Draggables\n" +
+          "\n" +
+          "- HTTP\n" +
+          "- HTTPS\n" +
+          "- SSH\n" +
+          "\n" +
+          "## Dropzones\n" +
+          "\n" +
+          "- 80\n" +
+          "- 443\n" +
+          "- 22\n" +
+          "\n" +
+          "## Pairs\n" +
+          "\n" +
+          "- HTTP -> 80\n" +
+          "> Unencrypted web traffic.\n" +
+          "- HTTPS -> 443\n" +
+          "> HTTP wrapped in TLS.\n" +
+          "- SSH -> 22\n" +
+          "> A common trap is 23 (Telnet).\n";
+
+        var SAMPLE_SIM =
+          "---\n" +
+          "type: SIMULATION\n" +
+          "domains: [System Hardening]\n" +
+          "difficulty: MEDIUM\n" +
+          "explanation: |\n" +
+          "  Snapshot, change, then restart. Telnet is a trap.\n" +
+          "---\n" +
+          "\n" +
+          "# Task\n" +
+          "\n" +
+          "Harden the SSH server. Put the steps in the correct order.\n" +
+          "\n" +
+          "## Steps\n" +
+          "\n" +
+          "1. Back up the current sshd_config\n" +
+          "> Snapshot before changing a live service.\n" +
+          "2. Set PasswordAuthentication to no\n" +
+          "3. Restart the SSH daemon\n" +
+          "\n" +
+          "## Distractors\n" +
+          "\n" +
+          "- Open port 23 for Telnet\n" +
+          "> Telnet is plaintext; it undoes the hardening.\n";
+
         function ensureSample() {
           if (!dslArea.value.trim()) {
             dslArea.value = SAMPLE;
             runValidate();
           }
         }
-        document.getElementById("load-sample").onclick = function () {
-          dslArea.value = SAMPLE;
+        function loadSample(text) {
+          dslArea.value = text;
           runValidate();
+        }
+        document.getElementById("sample-choice").onclick = function () {
+          loadSample(SAMPLE);
+        };
+        document.getElementById("sample-dragdrop").onclick = function () {
+          loadSample(SAMPLE_DRAGDROP);
+        };
+        document.getElementById("sample-sim").onclick = function () {
+          loadSample(SAMPLE_SIM);
         };
 
         function runValidate() {
@@ -1322,9 +1631,79 @@
           }
 
           previewEl.innerHTML = "";
-          if (res.success && res.data && res.data.choices) {
+          if (res.success && res.data) {
             previewEl.appendChild(renderStaticPreview(res.data));
           }
+        }
+
+        function appendRat(container, text) {
+          if (!text) return;
+          var r = el("div", "rationale");
+          var body = el("span");
+          body.innerHTML = inlineFmt(text);
+          r.appendChild(body);
+          container.appendChild(r);
+        }
+
+        function previewChoices(data) {
+          var ch = el("div", "choices");
+          data.choices.forEach(function (c) {
+            var lab = el("label", "choice locked" + (c.is_correct ? " correct" : ""));
+            lab.appendChild(el("span", "letter", c.letter + "."));
+            var t = el("span", "ctext");
+            t.innerHTML = inlineFmt(c.text);
+            lab.appendChild(t);
+            if (c.is_correct) lab.appendChild(el("span", "mark", "✓"));
+            ch.appendChild(lab);
+            appendRat(ch, c.rationale);
+          });
+          return ch;
+        }
+
+        function previewDragDrop(data) {
+          var qd = data.question_data;
+          var box = el("div");
+          box.appendChild(el("div", "order-intro", "Answer key — correct pairs:"));
+          qd.pairs.forEach(function (p) {
+            var row = el("div", "assign-row correct");
+            var a = el("span", "assign-label");
+            a.innerHTML = inlineFmt(p.draggable);
+            row.appendChild(a);
+            row.appendChild(el("span", "assign-arrow", "→"));
+            var b = el("span", "assign-label");
+            b.innerHTML = inlineFmt(p.dropzone);
+            row.appendChild(b);
+            box.appendChild(row);
+            appendRat(box, p.rationale);
+          });
+          return box;
+        }
+
+        function previewSimulation(data) {
+          var qd = data.question_data;
+          var box = el("div");
+          box.appendChild(el("div", "order-intro", "Answer key — steps in order:"));
+          qd.steps.forEach(function (s, i) {
+            var row = el("div", "order-row correct");
+            row.appendChild(el("span", "order-num", i + 1 + "."));
+            var t = el("span", "assign-label");
+            t.innerHTML = inlineFmt(s.text);
+            row.appendChild(t);
+            box.appendChild(row);
+            appendRat(box, s.rationale);
+          });
+          if ((qd.distractors || []).length) {
+            box.appendChild(el("div", "order-intro", "Distractors (wrong actions):"));
+            qd.distractors.forEach(function (d) {
+              var row = el("div", "assign-row chosen-wrong");
+              var t = el("span", "assign-label");
+              t.innerHTML = inlineFmt(d.text);
+              row.appendChild(t);
+              box.appendChild(row);
+              appendRat(box, d.rationale);
+            });
+          }
+          return box;
         }
 
         function renderStaticPreview(data) {
@@ -1337,24 +1716,11 @@
           var qt = el("div", "qtext");
           renderQText(qt, data.question_text);
           box.appendChild(qt);
-          var ch = el("div", "choices");
-          data.choices.forEach(function (c) {
-            var lab = el("label", "choice locked" + (c.is_correct ? " correct" : ""));
-            lab.appendChild(el("span", "letter", c.letter + "."));
-            var t = el("span", "ctext");
-            t.innerHTML = inlineFmt(c.text);
-            lab.appendChild(t);
-            if (c.is_correct) lab.appendChild(el("span", "mark", "✓"));
-            ch.appendChild(lab);
-            if (c.rationale) {
-              var r = el("div", "rationale");
-              var body = el("span");
-              body.innerHTML = inlineFmt(c.rationale);
-              r.appendChild(body);
-              ch.appendChild(r);
-            }
-          });
-          box.appendChild(ch);
+
+          if (data.type === "DRAG_DROP") box.appendChild(previewDragDrop(data));
+          else if (data.type === "SIMULATION") box.appendChild(previewSimulation(data));
+          else if (data.choices && data.choices.length) box.appendChild(previewChoices(data));
+
           if (data.explanation) {
             var ex = el("div", "explain");
             ex.appendChild(el("span", "lead", "Explanation"));
