@@ -1,0 +1,64 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "CompTIA",
+    "slug": "comptia",
+    "description": "Computing Technology Industry Association"
+  },
+  "certification": {
+    "name": "CompTIA Security+ (SY0-701)",
+    "code": "SY0-701",
+    "slug": "comptia-security-plus",
+    "description": "Entry-level cybersecurity certification. Domain weights below are CompTIA's official published exam objectives for SY0-701.",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 90,
+    "passing_score": 750
+  },
+  "domains": [
+    {
+      "name": "General Security Concepts",
+      "weight": 12,
+      "order": 1,
+      "description": "security controls, CIA triad, cryptographic concepts, change management, zero trust"
+    },
+    {
+      "name": "Threats, Vulnerabilities, and Mitigations",
+      "weight": 22,
+      "order": 2,
+      "description": "threat actors, attack surfaces, application/network vulnerabilities, malicious activity, mitigation techniques"
+    },
+    {
+      "name": "Security Architecture",
+      "weight": 18,
+      "order": 3,
+      "description": "architecture models, secure enterprise infrastructure, data protection, resilience and recovery"
+    },
+    {
+      "name": "Security Operations",
+      "weight": 28,
+      "order": 4,
+      "description": "hardening, monitoring, identity and access management, automation, incident response, investigation"
+    },
+    {
+      "name": "Security Program Management and Oversight",
+      "weight": 20,
+      "order": 5,
+      "description": "governance, risk management, third-party risk, compliance, audits, security awareness"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/general-security-concepts-001.md",
+    "questions/general-security-concepts-002.md",
+    "questions/threats-vulnerabilities-001.md",
+    "questions/threats-vulnerabilities-002.md",
+    "questions/security-operations-001.md",
+    "questions/security-operations-002.md",
+    "questions/security-operations-003.md"
+  ],
+  "generator": {
+    "note": "Hand-authored starter set — deliberately uneven: Security Architecture and Security Program Management have no questions yet, so `rubric blueprint` reports them as gaps. A full bank would be filled to the domain weights above."
+  }
+}

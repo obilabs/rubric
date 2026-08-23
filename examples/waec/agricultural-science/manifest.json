@@ -1,0 +1,135 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "WAEC",
+    "slug": "waec",
+    "description": "West African Examinations Council"
+  },
+  "certification": {
+    "name": "WAEC Agricultural Science",
+    "code": "WAEC-AGRIC",
+    "slug": "waec-agricultural-science",
+    "description": "WASSCE Agricultural Science practice questions",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 60,
+    "passing_score": 50
+  },
+  "domains": [
+    {
+      "name": "Crop Production",
+      "weight": 30,
+      "order": 1,
+      "description": "land preparation, planting, crop husbandry of Nigerian crops (maize, cassava, yam, rice, cocoa, oil palm), pests and diseases"
+    },
+    {
+      "name": "Animal Production",
+      "weight": 30,
+      "order": 2,
+      "description": "livestock breeds, housing, feeding, diseases, poultry, fisheries in Nigeria"
+    },
+    {
+      "name": "Soil Science and Farm Mechanisation",
+      "weight": 20,
+      "order": 3,
+      "description": "soil types, fertility, erosion, farm tools and machinery, irrigation"
+    },
+    {
+      "name": "Agricultural Economics and Extension",
+      "weight": 20,
+      "order": 4,
+      "description": "farm records, marketing, cooperative societies, extension methods, agricultural finance"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/agricultural-economics-and-extension-001.md",
+    "questions/agricultural-economics-and-extension-002.md",
+    "questions/agricultural-economics-and-extension-003.md",
+    "questions/agricultural-economics-and-extension-004.md",
+    "questions/agricultural-economics-and-extension-005.md",
+    "questions/agricultural-economics-and-extension-006.md",
+    "questions/agricultural-economics-and-extension-007.md",
+    "questions/agricultural-economics-and-extension-008.md",
+    "questions/agricultural-economics-and-extension-009.md",
+    "questions/agricultural-economics-and-extension-010.md",
+    "questions/agricultural-economics-and-extension-011.md",
+    "questions/agricultural-economics-and-extension-012.md",
+    "questions/animal-production-001.md",
+    "questions/animal-production-002.md",
+    "questions/animal-production-003.md",
+    "questions/animal-production-004.md",
+    "questions/animal-production-005.md",
+    "questions/animal-production-006.md",
+    "questions/animal-production-007.md",
+    "questions/animal-production-008.md",
+    "questions/animal-production-009.md",
+    "questions/animal-production-010.md",
+    "questions/animal-production-011.md",
+    "questions/animal-production-012.md",
+    "questions/animal-production-013.md",
+    "questions/animal-production-014.md",
+    "questions/animal-production-015.md",
+    "questions/animal-production-016.md",
+    "questions/animal-production-017.md",
+    "questions/animal-production-018.md",
+    "questions/crop-production-001.md",
+    "questions/crop-production-002.md",
+    "questions/crop-production-003.md",
+    "questions/crop-production-004.md",
+    "questions/crop-production-005.md",
+    "questions/crop-production-006.md",
+    "questions/crop-production-007.md",
+    "questions/crop-production-008.md",
+    "questions/crop-production-009.md",
+    "questions/crop-production-010.md",
+    "questions/crop-production-011.md",
+    "questions/crop-production-012.md",
+    "questions/crop-production-013.md",
+    "questions/crop-production-014.md",
+    "questions/crop-production-015.md",
+    "questions/crop-production-016.md",
+    "questions/crop-production-017.md",
+    "questions/crop-production-018.md",
+    "questions/soil-science-and-farm-mechanisation-001.md",
+    "questions/soil-science-and-farm-mechanisation-002.md",
+    "questions/soil-science-and-farm-mechanisation-003.md",
+    "questions/soil-science-and-farm-mechanisation-004.md",
+    "questions/soil-science-and-farm-mechanisation-005.md",
+    "questions/soil-science-and-farm-mechanisation-006.md",
+    "questions/soil-science-and-farm-mechanisation-007.md",
+    "questions/soil-science-and-farm-mechanisation-008.md",
+    "questions/soil-science-and-farm-mechanisation-009.md",
+    "questions/soil-science-and-farm-mechanisation-010.md",
+    "questions/soil-science-and-farm-mechanisation-011.md",
+    "questions/soil-science-and-farm-mechanisation-012.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-17T05:06:04Z",
+    "report": {
+      "Crop Production": {
+        "target": 18,
+        "kept": 18,
+        "rejected": 0
+      },
+      "Animal Production": {
+        "target": 18,
+        "kept": 18,
+        "rejected": 0
+      },
+      "Soil Science and Farm Mechanisation": {
+        "target": 12,
+        "kept": 12,
+        "rejected": 0
+      },
+      "Agricultural Economics and Extension": {
+        "target": 12,
+        "kept": 12,
+        "rejected": 0
+      }
+    },
+    "note": "AI-generated seed content — NOT real past questions. Review before presenting as exam-accurate."
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "WAEC",
+    "slug": "waec",
+    "description": "West African Examinations Council"
+  },
+  "certification": {
+    "name": "WAEC English Language",
+    "code": "WAEC-ENG",
+    "slug": "waec-english-language",
+    "description": "WASSCE English Language practice questions",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 60,
+    "passing_score": 50
+  },
+  "domains": [
+    {
+      "name": "Lexis and Structure",
+      "weight": 40,
+      "order": 1,
+      "description": "synonyms, antonyms, sentence completion, grammatical structure, idioms"
+    },
+    {
+      "name": "Vocabulary in Context",
+      "weight": 30,
+      "order": 2,
+      "description": "word meaning in context, registers for fields like medicine, agriculture, law, building"
+    },
+    {
+      "name": "Oral English",
+      "weight": 30,
+      "order": 3,
+      "description": "vowel/consonant sounds, stress patterns, rhymes, phonetic contrasts"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/lexis-and-structure-001.md",
+    "questions/lexis-and-structure-002.md",
+    "questions/lexis-and-structure-003.md",
+    "questions/lexis-and-structure-004.md",
+    "questions/lexis-and-structure-005.md",
+    "questions/lexis-and-structure-006.md",
+    "questions/lexis-and-structure-007.md",
+    "questions/lexis-and-structure-008.md",
+    "questions/lexis-and-structure-009.md",
+    "questions/lexis-and-structure-010.md",
+    "questions/lexis-and-structure-011.md",
+    "questions/lexis-and-structure-012.md",
+    "questions/lexis-and-structure-013.md",
+    "questions/lexis-and-structure-014.md",
+    "questions/lexis-and-structure-015.md",
+    "questions/lexis-and-structure-016.md",
+    "questions/lexis-and-structure-017.md",
+    "questions/lexis-and-structure-018.md",
+    "questions/lexis-and-structure-019.md",
+    "questions/lexis-and-structure-020.md",
+    "questions/lexis-and-structure-021.md",
+    "questions/lexis-and-structure-022.md",
+    "questions/lexis-and-structure-023.md",
+    "questions/lexis-and-structure-024.md",
+    "questions/oral-english-001.md",
+    "questions/oral-english-002.md",
+    "questions/oral-english-003.md",
+    "questions/oral-english-004.md",
+    "questions/oral-english-005.md",
+    "questions/oral-english-006.md",
+    "questions/oral-english-007.md",
+    "questions/oral-english-008.md",
+    "questions/oral-english-009.md",
+    "questions/oral-english-010.md",
+    "questions/oral-english-011.md",
+    "questions/oral-english-012.md",
+    "questions/oral-english-013.md",
+    "questions/oral-english-014.md",
+    "questions/oral-english-015.md",
+    "questions/oral-english-016.md",
+    "questions/oral-english-017.md",
+    "questions/oral-english-018.md",
+    "questions/vocabulary-in-context-001.md",
+    "questions/vocabulary-in-context-002.md",
+    "questions/vocabulary-in-context-003.md",
+    "questions/vocabulary-in-context-004.md",
+    "questions/vocabulary-in-context-005.md",
+    "questions/vocabulary-in-context-006.md",
+    "questions/vocabulary-in-context-007.md",
+    "questions/vocabulary-in-context-008.md",
+    "questions/vocabulary-in-context-009.md",
+    "questions/vocabulary-in-context-010.md",
+    "questions/vocabulary-in-context-011.md",
+    "questions/vocabulary-in-context-012.md",
+    "questions/vocabulary-in-context-013.md",
+    "questions/vocabulary-in-context-014.md",
+    "questions/vocabulary-in-context-015.md",
+    "questions/vocabulary-in-context-016.md",
+    "questions/vocabulary-in-context-017.md",
+    "questions/vocabulary-in-context-018.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-17T04:56:07Z",
+    "report": {
+      "Lexis and Structure": {
+        "target": 24,
+        "kept": 24,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Vocabulary in Context": {
+        "target": 18,
+        "kept": 18,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Oral English": {
+        "target": 18,
+        "kept": 18,
+        "rejected": 0,
+        "resumed": true
+      }
+    },
+    "note": "AI-generated seed content — NOT real past questions. Review before presenting as exam-accurate."
+  }
+}
