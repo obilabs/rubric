@@ -26,6 +26,8 @@ A. 120 *[CORRECT]*
 > (3 ÷ 5) × 200 = 120. "Three-fifths of 200" is the fraction times the whole.
 B. 40
 > This is one-fifth of 200 — you found one part but forgot to multiply by the 3.
+C. 60
+> You found a fifth, then divided again instead of multiplying by the 3.
 D. 333
 > You divided by the fraction instead of multiplying. Dividing by a number < 1 makes
 > the answer *bigger* than 200 — a useful sanity check.
@@ -37,11 +39,11 @@ D. 333
 
 There are already good ways to write a quiz as text — GIFT, QTI, `text2qti`, R/exams, and others. Rubric is **not** trying to be a better general quiz format, and if all you need is "author questions and score them," those tools are excellent and you should use them.
 
-Rubric exists because two things that matter most for *exam preparation* are usually treated as afterthoughts:
+Rubric exists because three things that matter most for *exam preparation* are usually treated as afterthoughts:
 
 ### 1. The rationale is a first-class citizen — per **choice**
 
-Most formats let you attach one explanation to a question. But a learner didn't get the question wrong in the abstract — they picked **B**, for a specific reason. A distractor *is* a misconception. Rubric gives every choice its own `>` rationale line so the feedback can address the mistake the learner actually made:
+Some formats *can* attach feedback to individual answers — GIFT and QTI among them — but it's an optional extra that's easy to skip and usually skipped. Rubric makes the per-choice rationale the default unit of a question, because a learner didn't get it wrong in the abstract — they picked **B**, for a specific reason. A distractor *is* a misconception, and the `>` rationale line addresses the mistake the learner actually made:
 
 ```markdown
 B. Oxygen
@@ -55,7 +57,7 @@ The rationale is the teaching payload. It's the thing a good tutor says and a sc
 
 A real exam isn't a flat pile of questions; it's a weighted distribution across domains. WAEC Mathematics is 25% each across four areas. CompTIA Security+ SY0-701 is 12 / 22 / 18 / 28 / 20 across five. Rubric captures that weighting in a bundle `manifest.json` and then **checks your question bank against it** — so "we cover the syllabus" stops being a claim and becomes a number you can see in CI.
 
-### 3. You own it
+### 3. The bank is **yours** — git-native, no lock-in
 
 It's Markdown in a git repo. No database, no proprietary export, no lock-in. Fork it, diff it, review it in a PR, and take it with you.
 
@@ -133,7 +135,7 @@ At a glance: a learner drilling this bank would be blindsided on Security Archit
 | **Parser** | `rubric.QuestionDSLParser`, `rubric.validate_dsl` | Markdown+YAML → structured `dict`, with line-located errors and warnings |
 | **Bundle** | `rubric.Bundle` | Loads a manifest, validates its files, computes domain coverage vs. blueprint weights |
 | **CLI** | `rubric validate`, `rubric blueprint` | Lint banks and report syllabus coverage |
-| **Examples** | `examples/` | 360 WAEC questions across 7 subjects + a CompTIA Security+ starter — real banks at real scale |
+| **Examples** | `examples/` | 360 WAEC questions across 7 subjects + a CompTIA Security+ starter — AI-generated seed content at enough volume to exercise the parser and the coverage tool |
 
 ### Question types
 
@@ -155,6 +157,8 @@ See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, and [`
 `examples/waec/` contains 360 questions across seven WAEC subjects; `examples/comptia-security-plus/` a hand-authored Security+ starter. **These are AI-generated seed content, clearly labelled as such in each manifest — not transcriptions of real past papers.** They exist to exercise the format at scale and to give the coverage tool something real to measure. Review before using any of it for actual study.
 
 Rubric is domain-agnostic: the same format carries a West African secondary-school maths bank and a professional IT certification bank without changing a line of the parser. Bringing your own exam is a matter of writing a `manifest.json` with your domains and their weights.
+
+> **Trademarks.** CompTIA® and Security+® are marks of CompTIA; WAEC and WASSCE are marks of the West African Examinations Council. Rubric and ObiLabs are not affiliated with or endorsed by them — exam names and their published domain weightings are referenced descriptively from public sources.
 
 ---
 

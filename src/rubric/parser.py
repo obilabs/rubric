@@ -100,15 +100,18 @@ class QuestionDSLParser:
                 ))
                 return ParseResult(success=False, errors=errors)
 
-            # Validate difficulty
+            # Validate difficulty. An invalid value is reported as a warning and
+            # then normalized to MEDIUM, so data['difficulty'] never carries a
+            # value outside VALID_DIFFICULTIES (this is what FORMAT.md documents).
             if 'difficulty' in frontmatter:
                 difficulty = frontmatter['difficulty']
                 if difficulty not in self.VALID_DIFFICULTIES:
                     warnings.append(ParseError(
                         line=2,
-                        message=f"Invalid difficulty '{difficulty}'. Will default to MEDIUM",
+                        message=f"Invalid difficulty '{difficulty}'. Defaulting to MEDIUM",
                         severity="warning"
                     ))
+                    frontmatter['difficulty'] = 'MEDIUM'
 
             # Parse content based on type
             content = parts[2]
@@ -201,11 +204,17 @@ class QuestionDSLParser:
                 line=self._find_line(content, "## Choices"),
                 message=f"MULTIPLE_SELECT must have at least 2 correct answers, found {correct_count}"
             ))
-        elif qtype == 'TRUE_FALSE' and len(choices) != 2:
-            errors.append(ParseError(
-                line=self._find_line(content, "## Choices"),
-                message=f"TRUE_FALSE must have exactly 2 choices, found {len(choices)}"
-            ))
+        elif qtype == 'TRUE_FALSE':
+            if len(choices) != 2:
+                errors.append(ParseError(
+                    line=self._find_line(content, "## Choices"),
+                    message=f"TRUE_FALSE must have exactly 2 choices, found {len(choices)}"
+                ))
+            elif correct_count != 1:
+                errors.append(ParseError(
+                    line=self._find_line(content, "## Choices"),
+                    message=f"TRUE_FALSE must have exactly 1 correct answer, found {correct_count}"
+                ))
 
         # Build result
         result = {
@@ -363,6 +372,7 @@ class QuestionDSLParser:
             "type": "DRAG_DROP",
             "domains": frontmatter.get('domains', []),
             "difficulty": frontmatter.get('difficulty', 'MEDIUM'),
+            "tags": frontmatter.get('tags', []),
             "question_text": "",
             "choices": [],
             "explanation": frontmatter.get('explanation', ''),
@@ -494,6 +504,7 @@ class QuestionDSLParser:
             "type": "SIMULATION",
             "domains": frontmatter.get('domains', []),
             "difficulty": frontmatter.get('difficulty', 'MEDIUM'),
+            "tags": frontmatter.get('tags', []),
             "question_text": "",
             "choices": [],
             "explanation": frontmatter.get('explanation', ''),

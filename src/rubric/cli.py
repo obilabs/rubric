@@ -6,8 +6,10 @@ Rubric command-line interface.
 
 ``validate`` exits non-zero when anything fails to parse, so it drops straight
 into CI or a pre-commit hook. ``blueprint`` prints the coverage table and, with
-``--strict``, exits non-zero when a blueprint domain is under-covered or empty —
-the check that keeps a question bank honest against the syllabus it advertises.
+``--strict``, exits non-zero when a domain needs attention — a blueprint domain
+that is under-covered or empty, or a question tagged with a domain the blueprint
+never declared — the check that keeps a bank honest against the syllabus it
+advertises.
 """
 
 from __future__ import annotations
@@ -108,10 +110,17 @@ def cmd_blueprint(args: argparse.Namespace) -> int:
     cert = bundle.manifest.get("certification", {})
     title = cert.get("name") or bundle.manifest.get("vendor", {}).get("name") or bundle.root
     rows = bundle.coverage()
-    total = sum(r.question_count for r in rows if r.in_blueprint)
+
+    # Percentages are computed over successfully-parsed questions only, so report
+    # that count (not the raw file count) as the denominator behind the table.
+    n_files = len(bundle.question_files)
+    n_failed = len(bundle.validate())
+    count_line = f"{n_files - n_failed} questions"
+    if n_failed:
+        count_line += f" ({n_failed} failed to parse, excluded from the percentages)"
 
     print(f"Blueprint coverage - {title}")
-    print(f"{len(bundle.question_files)} questions across {len(bundle.blueprint)} declared domains\n")
+    print(f"{count_line} across {len(bundle.blueprint)} declared domains\n")
 
     header = f"  {'domain':<34}{'target':>8}{'actual':>8}{'count':>7}{'delta':>8}  status"
     print(header)
@@ -158,7 +167,7 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument(
         "--strict",
         action="store_true",
-        help="exit non-zero if any blueprint domain is under-covered or empty",
+        help="exit non-zero if any domain needs attention (under-covered, empty, or off-blueprint)",
     )
     b.set_defaults(func=cmd_blueprint)
 
@@ -166,6 +175,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: List[str] | None = None) -> int:
+    # Domain names can carry characters outside a legacy Windows console's code
+    # page; degrade unprintable characters instead of aborting with UnicodeEncodeError.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+    except (AttributeError, ValueError):
+        pass
     parser = build_parser()
     args = parser.parse_args(argv)
     return args.func(args)
