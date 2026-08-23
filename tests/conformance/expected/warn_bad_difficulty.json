@@ -1,0 +1,28 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Answer"
+      }
+    ],
+    "difficulty": "MEDIUM",
+    "domains": [],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "Question text",
+    "tags": [],
+    "type": "MULTIPLE_CHOICE"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": [
+    {
+      "line": 2,
+      "message": "Invalid difficulty 'SUPER_HARD'. Defaulting to MEDIUM",
+      "severity": "warning"
+    }
+  ]
+}

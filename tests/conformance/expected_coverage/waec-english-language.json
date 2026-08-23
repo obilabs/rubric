@@ -1,0 +1,29 @@
+[
+  {
+    "actual_weight": 40.0,
+    "delta": 0.0,
+    "domain": "Lexis and Structure",
+    "in_blueprint": true,
+    "question_count": 24,
+    "status": "ok",
+    "target_weight": 40.0
+  },
+  {
+    "actual_weight": 30.0,
+    "delta": 0.0,
+    "domain": "Vocabulary in Context",
+    "in_blueprint": true,
+    "question_count": 18,
+    "status": "ok",
+    "target_weight": 30.0
+  },
+  {
+    "actual_weight": 30.0,
+    "delta": 0.0,
+    "domain": "Oral English",
+    "in_blueprint": true,
+    "question_count": 18,
+    "status": "ok",
+    "target_weight": 30.0
+  }
+]

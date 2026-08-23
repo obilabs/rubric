@@ -1,0 +1,1384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rubric Playground</title>
+    <meta
+      name="description"
+      content="Take an exam-prep question bank in the Rubric format, see the rationale for the exact option you picked, and get told which domains to drill — all in your browser, no backend."
+    />
+    <style>
+      :root {
+        --bg: #f6f7f9;
+        --surface: #ffffff;
+        --surface-2: #f0f2f6;
+        --text: #191d25;
+        --muted: #5b6472;
+        --border: #e3e6ec;
+        --border-strong: #cfd4dd;
+        --primary: #4f46e5;
+        --primary-text: #ffffff;
+        --primary-weak: #eef0fe;
+        --primary-weak-border: #d9dcfb;
+        --correct: #157347;
+        --correct-bg: #e4f6ea;
+        --correct-border: #a7dcbb;
+        --wrong: #b42318;
+        --wrong-bg: #fdeceb;
+        --wrong-border: #f2b8b3;
+        --warn: #b45309;
+        --warn-bg: #fdf3e2;
+        --warn-border: #f0d49a;
+        --shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
+          0 4px 16px rgba(16, 24, 40, 0.06);
+        --radius: 12px;
+        --mono: ui-monospace, "SF Mono", "SFMono-Regular", "Cascadia Code",
+          "JetBrains Mono", Menlo, Consolas, monospace;
+        --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+          sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d0f14;
+          --surface: #161922;
+          --surface-2: #1d212c;
+          --text: #e7e9ef;
+          --muted: #99a1b1;
+          --border: #262b37;
+          --border-strong: #333a49;
+          --primary: #8b83ff;
+          --primary-text: #14121f;
+          --primary-weak: #1c1f30;
+          --primary-weak-border: #2c2f45;
+          --correct: #58d189;
+          --correct-bg: #0f2519;
+          --correct-border: #245c3b;
+          --wrong: #f6837a;
+          --wrong-bg: #2a1512;
+          --wrong-border: #6a2a24;
+          --warn: #f2b64a;
+          --warn-bg: #2a2110;
+          --warn-border: #5e4a1f;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.35);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.55;
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 24px 20px 96px;
+      }
+
+      /* ---- header ---- */
+      header.masthead {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+      .logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        letter-spacing: -0.02em;
+      }
+      .logo .dot {
+        color: var(--primary);
+      }
+      .tagline {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 4px 0 20px;
+      }
+      .sub a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      .sub a:hover {
+        text-decoration: underline;
+      }
+      .privacy {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+      }
+
+      /* ---- tabs ---- */
+      .tabs {
+        display: inline-flex;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 3px;
+        margin-bottom: 20px;
+      }
+      .tabs button {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 7px 16px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+      .tabs button[aria-selected="true"] {
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: var(--shadow);
+      }
+
+      /* ---- cards ---- */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 22px;
+        margin-bottom: 18px;
+      }
+      h2.card-title {
+        margin: 0 0 4px;
+        font-size: 1.15rem;
+        letter-spacing: -0.01em;
+      }
+      .card-meta {
+        color: var(--muted);
+        font-size: 0.88rem;
+        margin-bottom: 14px;
+      }
+
+      label.field {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin: 14px 0 6px;
+      }
+      select,
+      textarea {
+        width: 100%;
+        font: inherit;
+        color: var(--text);
+        background: var(--surface);
+        border: 1px solid var(--border-strong);
+        border-radius: 9px;
+        padding: 10px 12px;
+      }
+      select:focus,
+      textarea:focus,
+      button:focus-visible,
+      .choice:focus-within {
+        outline: 2px solid var(--primary);
+        outline-offset: 1px;
+      }
+      textarea {
+        font-family: var(--mono);
+        font-size: 0.86rem;
+        line-height: 1.5;
+        min-height: 300px;
+        resize: vertical;
+        white-space: pre;
+        overflow-wrap: normal;
+        overflow-x: auto;
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .row > div {
+        flex: 1 1 160px;
+      }
+      .prov {
+        margin-top: 14px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        background: var(--warn-bg);
+        border: 1px solid var(--warn-border);
+        border-radius: 9px;
+        padding: 9px 12px;
+      }
+      .prov b {
+        color: var(--warn);
+      }
+
+      /* ---- buttons ---- */
+      button.btn {
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 9px;
+        padding: 10px 18px;
+        border: 1px solid var(--primary);
+        background: var(--primary);
+        color: var(--primary-text);
+      }
+      button.btn:hover {
+        filter: brightness(1.05);
+      }
+      button.btn.secondary {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border-strong);
+      }
+      button.btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      /* ---- quiz progress ---- */
+      .progress {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .bar {
+        flex: 1;
+        height: 6px;
+        background: var(--surface-2);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .bar > span {
+        display: block;
+        height: 100%;
+        background: var(--primary);
+        transition: width 0.25s ease;
+      }
+      .domain-chip {
+        display: inline-block;
+        background: var(--primary-weak);
+        border: 1px solid var(--primary-weak-border);
+        color: var(--primary);
+        border-radius: 999px;
+        padding: 2px 10px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        margin: 0 6px 8px 0;
+      }
+      .qtext {
+        font-size: 1.08rem;
+        margin: 6px 0 18px;
+      }
+      .qtext p {
+        margin: 0 0 10px;
+      }
+      .img-chip {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+        background: var(--surface-2);
+        border: 1px dashed var(--border-strong);
+        color: var(--muted);
+        border-radius: 8px;
+        padding: 3px 10px;
+        font-size: 0.82rem;
+        font-family: var(--mono);
+      }
+
+      /* ---- choices ---- */
+      .choices {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .choice {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        padding: 12px 14px;
+        cursor: pointer;
+        background: var(--surface);
+        transition: border-color 0.12s, background 0.12s;
+      }
+      .choice:hover {
+        border-color: var(--primary);
+      }
+      .choice input {
+        margin-top: 3px;
+        accent-color: var(--primary);
+        width: 17px;
+        height: 17px;
+        flex: none;
+      }
+      .choice .letter {
+        font-weight: 700;
+        color: var(--muted);
+        flex: none;
+      }
+      .choice .ctext {
+        flex: 1;
+      }
+      .choice.locked {
+        cursor: default;
+      }
+      .choice.locked:hover {
+        border-color: var(--border-strong);
+      }
+      .choice.correct {
+        border-color: var(--correct-border);
+        background: var(--correct-bg);
+      }
+      .choice.correct .letter,
+      .choice.correct .mark {
+        color: var(--correct);
+      }
+      .choice.chosen-wrong {
+        border-color: var(--wrong-border);
+        background: var(--wrong-bg);
+      }
+      .choice.chosen-wrong .letter,
+      .choice.chosen-wrong .mark {
+        color: var(--wrong);
+      }
+      .choice .mark {
+        font-weight: 700;
+        flex: none;
+        font-size: 0.9rem;
+      }
+      .rationale {
+        margin: 8px 0 0 29px;
+        font-size: 0.9rem;
+        color: var(--text);
+        border-left: 3px solid var(--border-strong);
+        padding-left: 12px;
+      }
+      .choice.correct + .rationale {
+        border-left-color: var(--correct-border);
+      }
+      .choice.chosen-wrong + .rationale {
+        border-left-color: var(--wrong-border);
+      }
+      .rationale .lead {
+        font-weight: 600;
+        color: var(--muted);
+        margin-right: 4px;
+      }
+
+      .explain {
+        margin-top: 18px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 0.92rem;
+      }
+      .explain .lead {
+        font-weight: 700;
+        display: block;
+        margin-bottom: 4px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .verdict {
+        font-weight: 700;
+        margin: 4px 0 0;
+      }
+      .verdict.ok {
+        color: var(--correct);
+      }
+      .verdict.no {
+        color: var(--wrong);
+      }
+
+      /* ---- results / diagnosis ---- */
+      .score-big {
+        font-size: 2.6rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .score-sub {
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .focus-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+      }
+      .focus-item:first-of-type {
+        border-top: 0;
+      }
+      .focus-rank {
+        font-weight: 800;
+        color: var(--muted);
+        font-size: 1.1rem;
+        width: 22px;
+        text-align: center;
+        flex: none;
+      }
+      .focus-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .focus-name {
+        font-weight: 600;
+      }
+      .focus-line {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .pill {
+        flex: none;
+        font-size: 0.76rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .pill.weak {
+        background: var(--wrong-bg);
+        color: var(--wrong);
+        border: 1px solid var(--wrong-border);
+      }
+      .pill.shaky {
+        background: var(--warn-bg);
+        color: var(--warn);
+        border: 1px solid var(--warn-border);
+      }
+      .pill.solid {
+        background: var(--correct-bg);
+        color: var(--correct);
+        border: 1px solid var(--correct-border);
+      }
+      .pill.untested {
+        background: var(--surface-2);
+        color: var(--muted);
+        border: 1px solid var(--border);
+      }
+
+      details.cov {
+        margin-top: 8px;
+      }
+      details.cov summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--primary);
+        font-size: 0.9rem;
+      }
+      .table-scroll {
+        overflow-x: auto;
+      }
+      table.cov {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-size: 0.88rem;
+        min-width: 460px;
+      }
+      table.cov th,
+      table.cov td {
+        text-align: right;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      table.cov th:first-child,
+      table.cov td:first-child {
+        text-align: left;
+        white-space: normal;
+      }
+      table.cov th {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .tag {
+        font-family: var(--mono);
+        font-size: 0.74rem;
+        font-weight: 700;
+        padding: 1px 7px;
+        border-radius: 5px;
+      }
+      .tag.ok {
+        color: var(--muted);
+      }
+      .tag.under,
+      .tag.uncovered,
+      .tag.orphan {
+        color: var(--wrong);
+        background: var(--wrong-bg);
+      }
+      .tag.over {
+        color: var(--warn);
+        background: var(--warn-bg);
+      }
+
+      /* ---- validator (paste mode) ---- */
+      .status-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .status-line.ok {
+        color: var(--correct);
+      }
+      .status-line.bad {
+        color: var(--wrong);
+      }
+      .diag {
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        padding: 3px 0;
+      }
+      .diag.error {
+        color: var(--wrong);
+      }
+      .diag.warning {
+        color: var(--warn);
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .foot {
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-top: 40px;
+      }
+      .foot a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+      .hidden {
+        display: none !important;
+      }
+      @media (max-width: 520px) {
+        .score-big {
+          font-size: 2.1rem;
+        }
+        .card {
+          padding: 18px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="masthead">
+        <span class="logo">Rubric<span class="dot">.</span></span>
+        <span class="tagline">exam-prep question banks that teach</span>
+      </header>
+      <p class="sub">
+        <span class="privacy">🔒 Runs entirely in your browser — nothing is uploaded</span>
+        &nbsp; Powered by a JavaScript port of the Rubric parser.
+        <a href="https://github.com/obilabs/rubric" target="_blank" rel="noopener"
+          >View the project →</a
+        >
+      </p>
+
+      <div class="tabs" role="tablist">
+        <button id="tab-take" role="tab" aria-selected="true">Take a bank</button>
+        <button id="tab-try" role="tab" aria-selected="false">Try the format</button>
+      </div>
+
+      <!-- ========================= TAKE A BANK ========================= -->
+      <section id="panel-take">
+        <!-- config -->
+        <div id="config" class="card">
+          <h2 class="card-title">Choose a question bank</h2>
+          <div class="card-meta">
+            Each bank is a folder of Markdown questions plus a manifest that declares
+            the exam's domains and their official weights — the blueprint your results
+            get scored against.
+          </div>
+          <div class="row">
+            <div style="flex: 2 1 260px">
+              <label class="field" for="bank">Bank</label>
+              <select id="bank"></select>
+            </div>
+            <div>
+              <label class="field" for="count">Questions</label>
+              <select id="count">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="0">All</option>
+              </select>
+            </div>
+            <div>
+              <label class="field" for="shuffle">Order</label>
+              <select id="shuffle">
+                <option value="1">Shuffle</option>
+                <option value="0">In order</option>
+              </select>
+            </div>
+          </div>
+          <div id="bank-desc" class="card-meta" style="margin-top: 14px"></div>
+          <div id="bank-prov" class="prov hidden"></div>
+          <div class="btn-row">
+            <button id="start" class="btn">Start</button>
+          </div>
+        </div>
+
+        <!-- quiz runner -->
+        <div id="quiz" class="card hidden">
+          <div class="progress">
+            <span id="q-counter">Question 1 of 10</span>
+            <span class="bar"><span id="q-bar" style="width: 0%"></span></span>
+          </div>
+          <div id="q-domains"></div>
+          <div id="q-text" class="qtext"></div>
+          <form id="q-form" class="choices"></form>
+          <div id="q-explain"></div>
+          <div class="btn-row">
+            <button id="submit" class="btn" type="button">Submit answer</button>
+            <button id="next" class="btn hidden" type="button">Next →</button>
+            <button id="quit" class="btn secondary" type="button">End &amp; see results</button>
+          </div>
+        </div>
+
+        <!-- results -->
+        <div id="results" class="hidden"></div>
+      </section>
+
+      <!-- ========================= TRY THE FORMAT ========================= -->
+      <section id="panel-try" class="hidden">
+        <div class="card">
+          <h2 class="card-title">Write a question, see it validated live</h2>
+          <div class="card-meta">
+            A Rubric question is YAML frontmatter + a Markdown body. Mark the answer
+            with <code>*[CORRECT]*</code>; add a <code>&gt;</code> line under any choice
+            to explain the misconception it represents.
+          </div>
+          <textarea id="dsl" spellcheck="false"></textarea>
+          <div class="btn-row">
+            <button id="load-sample" class="btn secondary" type="button">Reset sample</button>
+          </div>
+        </div>
+        <div class="card">
+          <div id="validate-out"></div>
+          <div id="preview" style="margin-top: 16px"></div>
+        </div>
+      </section>
+
+      <p class="foot">
+        Rubric is open source under Apache-2.0 ·
+        <a href="https://github.com/obilabs/rubric" target="_blank" rel="noopener"
+          >github.com/obilabs/rubric</a
+        >
+      </p>
+    </div>
+
+    <script src="rubric.js"></script>
+    <script src="examples.bundle.js"></script>
+    <script>
+      "use strict";
+      (function () {
+        var R = window.Rubric;
+        var BANKS = window.RUBRIC_EXAMPLES || [];
+
+        // ---------- helpers ----------
+        function el(tag, cls, text) {
+          var e = document.createElement(tag);
+          if (cls) e.className = cls;
+          if (text != null) e.textContent = text;
+          return e;
+        }
+        function esc(s) {
+          var d = document.createElement("div");
+          d.textContent = s == null ? "" : String(s);
+          return d.innerHTML;
+        }
+        // Escape first, THEN apply light inline formatting — never trust bank text.
+        function inlineFmt(s) {
+          var h = esc(s);
+          h = h.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+          h = h.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+          h = h.replace(/`([^`]+)`/g, "<code>$1</code>");
+          return h;
+        }
+        // Render question text: paragraphs, [IMAGE: x] as a placeholder chip.
+        function renderQText(container, text) {
+          container.innerHTML = "";
+          String(text)
+            .split(/\n\s*\n/)
+            .forEach(function (para) {
+              if (!para.trim()) return;
+              var p = el("p");
+              var parts = para.split(/(\[IMAGE:[^\]]*\])/);
+              parts.forEach(function (part) {
+                var m = /^\[IMAGE:\s*([^\]]*)\]$/.exec(part);
+                if (m) {
+                  var chip = el("span", "img-chip");
+                  chip.appendChild(document.createTextNode("🖼 "));
+                  chip.appendChild(document.createTextNode(m[1].trim()));
+                  p.appendChild(chip);
+                } else if (part) {
+                  var span = el("span");
+                  span.innerHTML = inlineFmt(part).replace(/\n/g, "<br>");
+                  p.appendChild(span);
+                }
+              });
+              container.appendChild(p);
+            });
+        }
+        function domainsOf(data) {
+          var d = data.domains;
+          if (typeof d === "string") return [d];
+          if (Array.isArray(d)) return d;
+          return [];
+        }
+        function shuffleInPlace(a) {
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i];
+            a[i] = a[j];
+            a[j] = t;
+          }
+          return a;
+        }
+        function pct(n, d) {
+          return d ? Math.round((100 * n) / d) : 0;
+        }
+
+        // ---------- tabs ----------
+        var tabTake = document.getElementById("tab-take");
+        var tabTry = document.getElementById("tab-try");
+        var panelTake = document.getElementById("panel-take");
+        var panelTry = document.getElementById("panel-try");
+        function selectTab(which) {
+          var take = which === "take";
+          tabTake.setAttribute("aria-selected", take ? "true" : "false");
+          tabTry.setAttribute("aria-selected", take ? "false" : "true");
+          panelTake.classList.toggle("hidden", !take);
+          panelTry.classList.toggle("hidden", take);
+        }
+        tabTake.onclick = function () {
+          selectTab("take");
+        };
+        tabTry.onclick = function () {
+          selectTab("try");
+          ensureSample();
+        };
+
+        // ---------- bank picker ----------
+        var bankSel = document.getElementById("bank");
+        var bankDesc = document.getElementById("bank-desc");
+        var bankProv = document.getElementById("bank-prov");
+
+        BANKS.forEach(function (b, i) {
+          var opt = el("option", null, b.title);
+          opt.value = String(i);
+          bankSel.appendChild(opt);
+        });
+
+        function currentBank() {
+          return BANKS[parseInt(bankSel.value, 10) || 0];
+        }
+        function parsedQuestions(bank) {
+          // Parse each question once; keep only successful choice-type questions.
+          return bank.questions
+            .map(function (q) {
+              var res = R.parse(q.text);
+              return res.success ? res.data : null;
+            })
+            .filter(Boolean)
+            .filter(function (d) {
+              return Array.isArray(d.choices) && d.choices.length > 0;
+            });
+        }
+        function provNote(bank) {
+          var g = bank.manifest.generator || {};
+          var cert = bank.manifest.certification || {};
+          return g.note || cert.description || "";
+        }
+        function refreshBankDesc() {
+          var b = currentBank();
+          var cert = b.manifest.certification || {};
+          var domains = Array.isArray(b.manifest.domains) ? b.manifest.domains : [];
+          var nQ = b.questions.length;
+          bankDesc.textContent =
+            (b.vendor ? b.vendor + " · " : "") +
+            nQ +
+            " questions across " +
+            domains.length +
+            " blueprint domains" +
+            (cert.passing_score ? " · passing score " + cert.passing_score : "");
+          var note = provNote(b);
+          if (note) {
+            bankProv.classList.remove("hidden");
+            bankProv.innerHTML = "<b>Provenance:</b> " + esc(note);
+          } else {
+            bankProv.classList.add("hidden");
+          }
+        }
+        bankSel.onchange = refreshBankDesc;
+        if (BANKS.length) refreshBankDesc();
+
+        // ---------- quiz state ----------
+        var quizEl = document.getElementById("config");
+        var runnerEl = document.getElementById("quiz");
+        var resultsEl = document.getElementById("results");
+        var state = null;
+
+        document.getElementById("start").onclick = function () {
+          var bank = currentBank();
+          var all = parsedQuestions(bank);
+          if (!all.length) {
+            alert("This bank has no answerable questions.");
+            return;
+          }
+          var order = all.slice();
+          if (document.getElementById("shuffle").value === "1") shuffleInPlace(order);
+          var count = parseInt(document.getElementById("count").value, 10);
+          if (count > 0) order = order.slice(0, count);
+
+          state = {
+            bank: bank,
+            all: all, // full parsed set (for bank-coverage view)
+            questions: order,
+            idx: 0,
+            answered: [], // per question: {picked:Set, correct:bool}
+          };
+          quizEl.classList.add("hidden");
+          resultsEl.classList.add("hidden");
+          runnerEl.classList.remove("hidden");
+          renderQuestion();
+          runnerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+
+        var qCounter = document.getElementById("q-counter");
+        var qBar = document.getElementById("q-bar");
+        var qDomains = document.getElementById("q-domains");
+        var qTextEl = document.getElementById("q-text");
+        var qForm = document.getElementById("q-form");
+        var qExplain = document.getElementById("q-explain");
+        var submitBtn = document.getElementById("submit");
+        var nextBtn = document.getElementById("next");
+        var quitBtn = document.getElementById("quit");
+
+        function isMulti(data) {
+          return data.type === "MULTIPLE_SELECT";
+        }
+
+        function renderQuestion() {
+          var data = state.questions[state.idx];
+          var total = state.questions.length;
+          qCounter.textContent =
+            "Question " + (state.idx + 1) + " of " + total;
+          qBar.style.width = pct(state.idx, total) + "%";
+
+          qDomains.innerHTML = "";
+          domainsOf(data).forEach(function (dm) {
+            qDomains.appendChild(el("span", "domain-chip", dm));
+          });
+
+          renderQText(qTextEl, data.question_text);
+
+          qForm.innerHTML = "";
+          qExplain.innerHTML = "";
+          var multi = isMulti(data);
+          data.choices.forEach(function (c, i) {
+            var lab = el("label", "choice");
+            lab.dataset.i = String(i);
+            var input = document.createElement("input");
+            input.type = multi ? "checkbox" : "radio";
+            input.name = "choice";
+            input.value = String(i);
+            lab.appendChild(input);
+            lab.appendChild(el("span", "letter", c.letter + "."));
+            var t = el("span", "ctext");
+            t.innerHTML = inlineFmt(c.text);
+            lab.appendChild(t);
+            qForm.appendChild(lab);
+          });
+
+          submitBtn.classList.remove("hidden");
+          submitBtn.disabled = false;
+          nextBtn.classList.add("hidden");
+          nextBtn.textContent =
+            state.idx + 1 >= total ? "See my results →" : "Next →";
+        }
+
+        submitBtn.onclick = function () {
+          var data = state.questions[state.idx];
+          var multi = isMulti(data);
+          var picked = new Set();
+          qForm.querySelectorAll("input").forEach(function (inp) {
+            if (inp.checked) picked.add(parseInt(inp.value, 10));
+          });
+          if (picked.size === 0) return; // require an answer
+
+          var correctIdx = new Set();
+          data.choices.forEach(function (c, i) {
+            if (c.is_correct) correctIdx.add(i);
+          });
+          var isRight =
+            picked.size === correctIdx.size &&
+            [].every.call(Array.from(picked), function (i) {
+              return correctIdx.has(i);
+            });
+
+          // lock + reveal
+          var labels = qForm.querySelectorAll(".choice");
+          labels.forEach(function (lab, i) {
+            lab.classList.add("locked");
+            var inp = lab.querySelector("input");
+            inp.disabled = true;
+            var c = data.choices[i];
+            if (c.is_correct) {
+              lab.classList.add("correct");
+              lab.appendChild(el("span", "mark", "✓"));
+            } else if (picked.has(i)) {
+              lab.classList.add("chosen-wrong");
+              lab.appendChild(el("span", "mark", "✗"));
+            }
+            // per-choice rationale (the differentiator) — show for the option the
+            // learner engaged with: their pick, and the correct answer.
+            if (c.rationale && (picked.has(i) || c.is_correct)) {
+              var r = el("div", "rationale");
+              var lead = el("span", "lead", picked.has(i) ? "Your choice —" : "Correct —");
+              r.appendChild(lead);
+              var body = el("span");
+              body.innerHTML = inlineFmt(c.rationale);
+              r.appendChild(body);
+              lab.after(r);
+            }
+          });
+
+          var verdict = el(
+            "p",
+            "verdict " + (isRight ? "ok" : "no"),
+            isRight ? "✓ Correct" : "✗ Not quite"
+          );
+          qExplain.appendChild(verdict);
+          if (data.explanation) {
+            var ex = el("div", "explain");
+            ex.appendChild(el("span", "lead", "Explanation"));
+            var exBody = el("span");
+            exBody.innerHTML = inlineFmt(data.explanation).replace(/\n/g, "<br>");
+            ex.appendChild(exBody);
+            qExplain.appendChild(ex);
+          }
+
+          state.answered[state.idx] = { correct: isRight };
+          submitBtn.classList.add("hidden");
+          nextBtn.classList.remove("hidden");
+          qBar.style.width = pct(state.idx + 1, state.questions.length) + "%";
+        };
+
+        nextBtn.onclick = function () {
+          if (state.idx + 1 >= state.questions.length) {
+            showResults();
+          } else {
+            state.idx += 1;
+            renderQuestion();
+            runnerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        };
+        quitBtn.onclick = function () {
+          showResults();
+        };
+
+        // ---------- results & diagnosis ----------
+        function verdictFor(acc) {
+          if (acc >= 0.8) return { key: "solid", label: "Solid" };
+          if (acc >= 0.5) return { key: "shaky", label: "Shaky" };
+          return { key: "weak", label: "Weak" };
+        }
+
+        function showResults() {
+          runnerEl.classList.add("hidden");
+          resultsEl.classList.remove("hidden");
+          resultsEl.innerHTML = "";
+
+          var answeredCount = 0;
+          var correctCount = 0;
+          // per-domain performance over answered questions
+          var perf = {}; // name -> {answered, correct}
+          state.questions.forEach(function (data, i) {
+            var a = state.answered[i];
+            if (!a) return;
+            answeredCount += 1;
+            if (a.correct) correctCount += 1;
+            domainsOf(data).forEach(function (dm) {
+              if (!perf[dm]) perf[dm] = { answered: 0, correct: 0 };
+              perf[dm].answered += 1;
+              if (a.correct) perf[dm].correct += 1;
+            });
+          });
+
+          var manifest = state.bank.manifest;
+          var blueprint = Array.isArray(manifest.domains) ? manifest.domains : [];
+
+          // --- score card ---
+          var scoreCard = el("div", "card");
+          scoreCard.appendChild(el("h2", "card-title", "Your results"));
+          scoreCard.appendChild(
+            (function () {
+              var s = el("div", "score-big");
+              s.textContent =
+                correctCount + " / " + answeredCount;
+              return s;
+            })()
+          );
+          scoreCard.appendChild(
+            el(
+              "div",
+              "score-sub",
+              pct(correctCount, answeredCount) +
+                "% correct on " +
+                (state.bank.certification ? "" : "") +
+                (manifest.certification && manifest.certification.name
+                  ? manifest.certification.name
+                  : state.bank.title)
+            )
+          );
+          resultsEl.appendChild(scoreCard);
+
+          // --- domain diagnosis (differentiator #2) ---
+          var diagCard = el("div", "card");
+          diagCard.appendChild(el("h2", "card-title", "What to drill next"));
+          diagCard.appendChild(
+            el(
+              "div",
+              "card-meta",
+              "Ranked by exam weight × how much you missed — a heavy domain you're " +
+                "shaky on beats a light one you aced."
+            )
+          );
+
+          // Build ranked focus list from blueprint domains you were tested on.
+          var focus = [];
+          blueprint.forEach(function (entry) {
+            var name = entry.name;
+            var weight = R.coerceWeight(entry.weight);
+            var p = perf[name];
+            if (p && p.answered > 0) {
+              var acc = p.correct / p.answered;
+              var priority = (weight == null ? 0 : weight) * (1 - acc);
+              focus.push({
+                name: name,
+                weight: weight,
+                answered: p.answered,
+                correct: p.correct,
+                acc: acc,
+                priority: priority,
+                tested: true,
+              });
+            } else {
+              focus.push({
+                name: name,
+                weight: weight,
+                answered: 0,
+                correct: 0,
+                acc: null,
+                priority: -1,
+                tested: false,
+              });
+            }
+          });
+          // Orphan domains (questions tagged with something not in the blueprint).
+          Object.keys(perf).forEach(function (name) {
+            var known = blueprint.some(function (e) {
+              return e.name === name;
+            });
+            if (!known) {
+              var p = perf[name];
+              var acc = p.correct / p.answered;
+              focus.push({
+                name: name,
+                weight: null,
+                answered: p.answered,
+                correct: p.correct,
+                acc: acc,
+                priority: 0,
+                tested: true,
+                orphan: true,
+              });
+            }
+          });
+
+          var tested = focus.filter(function (f) {
+            return f.tested;
+          });
+          var untested = focus.filter(function (f) {
+            return !f.tested;
+          });
+          tested.sort(function (a, b) {
+            return b.priority - a.priority;
+          });
+
+          if (!tested.length) {
+            diagCard.appendChild(
+              el("p", "muted", "No blueprint domains were assessed in this run.")
+            );
+          }
+          tested.forEach(function (f, i) {
+            var v = verdictFor(f.acc);
+            var item = el("div", "focus-item");
+            item.appendChild(el("div", "focus-rank", String(i + 1)));
+            var body = el("div", "focus-body");
+            body.appendChild(el("div", "focus-name", f.name));
+            var line =
+              f.correct +
+              "/" +
+              f.answered +
+              " correct (" +
+              Math.round(f.acc * 100) +
+              "%)" +
+              (f.weight != null ? " · " + f.weight + "% of the exam" : "") +
+              (f.orphan ? " · not in blueprint" : "");
+            body.appendChild(el("div", "focus-line", line));
+            item.appendChild(body);
+            item.appendChild(el("span", "pill " + v.key, v.label));
+            diagCard.appendChild(item);
+          });
+
+          if (untested.length) {
+            var un = el(
+              "div",
+              "focus-line",
+              "Not assessed this run: " +
+                untested
+                  .map(function (f) {
+                    return f.name + (f.weight != null ? " (" + f.weight + "%)" : "");
+                  })
+                  .join(", ") +
+                ". These carry exam weight but no question in your set covered them" +
+                " — a gap the bank itself may have."
+            );
+            un.style.marginTop = "14px";
+            un.style.paddingTop = "14px";
+            un.style.borderTop = "1px solid var(--border)";
+            diagCard.appendChild(un);
+          }
+          resultsEl.appendChild(diagCard);
+
+          // --- bank blueprint coverage (author-facing, collapsible) ---
+          resultsEl.appendChild(bankCoverageCard(manifest, state.all));
+
+          // --- actions ---
+          var actions = el("div", "btn-row");
+          var again = el("button", "btn", "Take another set");
+          again.onclick = function () {
+            resultsEl.classList.add("hidden");
+            quizEl.classList.remove("hidden");
+            quizEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          };
+          actions.appendChild(again);
+          resultsEl.appendChild(actions);
+          resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function bankCoverageCard(manifest, allParsed) {
+          var card = el("div", "card");
+          var det = el("details", "cov");
+          var sum = el("summary", null, "How this bank maps to the exam blueprint");
+          det.appendChild(sum);
+          det.appendChild(
+            el(
+              "div",
+              "card-meta",
+              "This is the author's view — whether the bank's questions are distributed " +
+                "the way the real exam weights its domains. It's exactly what " +
+                "`rubric blueprint` reports in CI."
+            )
+          );
+          var rows = R.coverage(manifest, allParsed);
+          var scroll = el("div", "table-scroll");
+          var t = el("table", "cov");
+          t.innerHTML =
+            "<thead><tr><th>Domain</th><th>Target</th><th>Actual</th>" +
+            "<th>Q</th><th>Status</th></tr></thead>";
+          var tb = el("tbody");
+          rows.forEach(function (r) {
+            var tr = el("tr");
+            tr.appendChild(el("td", null, r.domain));
+            tr.appendChild(
+              el("td", null, r.target_weight == null ? "—" : r.target_weight + "%")
+            );
+            tr.appendChild(el("td", null, r.actual_weight + "%"));
+            tr.appendChild(el("td", null, String(r.question_count)));
+            var st = el("td");
+            st.appendChild(el("span", "tag " + r.status, r.status));
+            tr.appendChild(st);
+            tb.appendChild(tr);
+          });
+          t.appendChild(tb);
+          scroll.appendChild(t);
+          det.appendChild(scroll);
+          card.appendChild(det);
+          return card;
+        }
+
+        // ---------- try-the-format (validator) ----------
+        var dslArea = document.getElementById("dsl");
+        var validateOut = document.getElementById("validate-out");
+        var previewEl = document.getElementById("preview");
+        var SAMPLE =
+          "---\n" +
+          "type: SINGLE_CHOICE\n" +
+          "domains: [Number and Numeration]\n" +
+          "difficulty: EASY\n" +
+          "tags: [fractions, word-problem]\n" +
+          "explanation: |\n" +
+          "  Three-fifths of 200 is (3 / 5) * 200 = 120. \"Of\" means multiply.\n" +
+          "---\n" +
+          "\n" +
+          "# Question\n" +
+          "\n" +
+          "A farmer harvests 200 mangoes and sells three-fifths of them.\n" +
+          "How many does she sell?\n" +
+          "\n" +
+          "## Choices\n" +
+          "\n" +
+          "A. 120 *[CORRECT]*\n" +
+          "> (3 / 5) * 200 = 120. The fraction times the whole.\n" +
+          "B. 40\n" +
+          "> This is one-fifth of 200 — you forgot to multiply by the 3.\n" +
+          "C. 333\n" +
+          "> You divided by three-fifths instead of multiplying by it.\n";
+
+        function ensureSample() {
+          if (!dslArea.value.trim()) {
+            dslArea.value = SAMPLE;
+            runValidate();
+          }
+        }
+        document.getElementById("load-sample").onclick = function () {
+          dslArea.value = SAMPLE;
+          runValidate();
+        };
+
+        function runValidate() {
+          var res = R.parse(dslArea.value);
+          validateOut.innerHTML = "";
+          var line = el(
+            "div",
+            "status-line " + (res.success ? "ok" : "bad")
+          );
+          line.textContent = res.success
+            ? "✓ Valid Rubric question"
+            : "✗ " + res.errors.length + " error(s)";
+          validateOut.appendChild(line);
+
+          res.errors.forEach(function (e) {
+            validateOut.appendChild(
+              el("div", "diag error", "line " + e.line + ": " + e.message)
+            );
+          });
+          res.warnings.forEach(function (w) {
+            validateOut.appendChild(
+              el("div", "diag warning", "warning · line " + w.line + ": " + w.message)
+            );
+          });
+          if (res.success && !res.warnings.length) {
+            validateOut.appendChild(
+              el("div", "diag muted", "No warnings. Ready to commit.")
+            );
+          }
+
+          previewEl.innerHTML = "";
+          if (res.success && res.data && res.data.choices) {
+            previewEl.appendChild(renderStaticPreview(res.data));
+          }
+        }
+
+        function renderStaticPreview(data) {
+          var box = el("div");
+          var dm = el("div");
+          domainsOf(data).forEach(function (d) {
+            dm.appendChild(el("span", "domain-chip", d));
+          });
+          box.appendChild(dm);
+          var qt = el("div", "qtext");
+          renderQText(qt, data.question_text);
+          box.appendChild(qt);
+          var ch = el("div", "choices");
+          data.choices.forEach(function (c) {
+            var lab = el("label", "choice locked" + (c.is_correct ? " correct" : ""));
+            lab.appendChild(el("span", "letter", c.letter + "."));
+            var t = el("span", "ctext");
+            t.innerHTML = inlineFmt(c.text);
+            lab.appendChild(t);
+            if (c.is_correct) lab.appendChild(el("span", "mark", "✓"));
+            ch.appendChild(lab);
+            if (c.rationale) {
+              var r = el("div", "rationale");
+              var body = el("span");
+              body.innerHTML = inlineFmt(c.rationale);
+              r.appendChild(body);
+              ch.appendChild(r);
+            }
+          });
+          box.appendChild(ch);
+          if (data.explanation) {
+            var ex = el("div", "explain");
+            ex.appendChild(el("span", "lead", "Explanation"));
+            var b = el("span");
+            b.innerHTML = inlineFmt(data.explanation).replace(/\n/g, "<br>");
+            ex.appendChild(b);
+            box.appendChild(ex);
+          }
+          return box;
+        }
+
+        var debounceT = null;
+        dslArea.addEventListener("input", function () {
+          clearTimeout(debounceT);
+          debounceT = setTimeout(runValidate, 250);
+        });
+
+        // ---------- boot ----------
+        if (!BANKS.length) {
+          bankDesc.textContent =
+            "No example banks were bundled. Run `node web/build_examples.cjs`.";
+          document.getElementById("start").disabled = true;
+        }
+      })();
+    </script>
+  </body>
+</html>

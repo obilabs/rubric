@@ -1,0 +1,28 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Test"
+    ],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "This question has no Choices section.",
+    "tags": [],
+    "type": "SINGLE_CHOICE"
+  },
+  "errors": [
+    {
+      "line": 0,
+      "message": "Missing '## Choices' section",
+      "severity": "error"
+    },
+    {
+      "line": 0,
+      "message": "SINGLE_CHOICE must have exactly 1 correct answer, found 0",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

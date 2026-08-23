@@ -1,0 +1,38 @@
+[
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Number and Numeration",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Algebraic Processes",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Geometry and Mensuration",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  },
+  {
+    "actual_weight": 25.0,
+    "delta": 0.0,
+    "domain": "Statistics and Probability",
+    "in_blueprint": true,
+    "question_count": 15,
+    "status": "ok",
+    "target_weight": 25.0
+  }
+]

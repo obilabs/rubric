@@ -1,0 +1,11 @@
+{
+  "name": "rubric-playground",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zero-backend browser playground for the Rubric format, plus the JavaScript parser port and its parity tests against the Python reference.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node test/parity.test.cjs && node test/coverage_parity.test.cjs",
+    "build:examples": "node build_examples.cjs"
+  }
+}

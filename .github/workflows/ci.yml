@@ -29,3 +29,22 @@ jobs:
             echo "== $m =="
             rubric validate "$m"
           done
+
+  # The JavaScript port must stay byte-for-byte in step with the Python parser,
+  # and the inlined example bundle must be current. Both are checked here with no
+  # npm dependencies to install.
+  web-parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Example bundle is up to date
+        run: |
+          node web/build_examples.cjs
+          git diff --exit-code -- web/examples.bundle.js \
+            || (echo "web/examples.bundle.js is stale — run: node web/build_examples.cjs" && exit 1)
+      - name: JS parser and coverage parity with the Python reference
+        working-directory: web
+        run: npm test

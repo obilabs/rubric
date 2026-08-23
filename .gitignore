@@ -16,6 +16,11 @@ env/
 .coverage
 htmlcov/
 
+# Node (the web playground has no runtime deps, but tooling may create these)
+node_modules/
+npm-debug.log*
+.npm/
+
 # Editors / OS
 .idea/
 .vscode/

@@ -1,0 +1,43 @@
+{
+  "data": {
+    "choices": [
+      {
+        "is_correct": true,
+        "letter": "A",
+        "rationale": null,
+        "text": "Only correct"
+      },
+      {
+        "is_correct": false,
+        "letter": "B",
+        "rationale": null,
+        "text": "Wrong"
+      },
+      {
+        "is_correct": false,
+        "letter": "C",
+        "rationale": null,
+        "text": "Wrong"
+      }
+    ],
+    "correct_count": 1,
+    "difficulty": "MEDIUM",
+    "domains": [
+      "Test"
+    ],
+    "explanation": "",
+    "question_data": {},
+    "question_text": "Multiple select needs at least two correct answers.",
+    "tags": [],
+    "type": "MULTIPLE_SELECT"
+  },
+  "errors": [
+    {
+      "line": 6,
+      "message": "MULTIPLE_SELECT must have at least 2 correct answers, found 1",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

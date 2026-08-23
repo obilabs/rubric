@@ -1,0 +1,37 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "HARD",
+    "domains": [
+      "Network Security"
+    ],
+    "explanation": "",
+    "question_data": {
+      "correctRegions": [
+        {
+          "height": 50,
+          "label": "DMZ Interface",
+          "width": 100,
+          "x": 250,
+          "y": 180
+        }
+      ],
+      "distractorRegions": [
+        {
+          "height": 50,
+          "label": "WAN Interface",
+          "width": 100,
+          "x": 250,
+          "y": 80
+        }
+      ],
+      "image": "network-diagram.png"
+    },
+    "question_text": "Click on the firewall interface that is configured for the DMZ network.\n\n[IMAGE: network-diagram]",
+    "tags": [],
+    "type": "HOTSPOT"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

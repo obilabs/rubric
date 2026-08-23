@@ -1,0 +1,97 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "HARD",
+    "domains": [
+      "Security Operations",
+      "Incident Response"
+    ],
+    "explanation": null,
+    "question_data": {
+      "total_sub_questions": 2
+    },
+    "question_text": "Your organization experienced a data breach when an S3 bucket containing customer PII was\npublicly exposed for 48 hours.\n\n[IMAGE: incident-timeline]",
+    "sub_questions": [
+      {
+        "choices": [
+          {
+            "is_correct": false,
+            "letter": "A",
+            "rationale": null,
+            "text": "Notify affected customers immediately"
+          },
+          {
+            "is_correct": true,
+            "letter": "B",
+            "rationale": null,
+            "text": "Isolate the affected S3 bucket"
+          },
+          {
+            "is_correct": false,
+            "letter": "C",
+            "rationale": null,
+            "text": "Update the incident response plan"
+          },
+          {
+            "is_correct": false,
+            "letter": "D",
+            "rationale": null,
+            "text": "Conduct a full security audit"
+          }
+        ],
+        "correct_count": null,
+        "explanation": "Isolation prevents further data exposure and should be the immediate first step.",
+        "question_number": 1,
+        "question_text": "What should be the FIRST priority in responding to this incident?",
+        "question_type": "SINGLE_CHOICE"
+      },
+      {
+        "choices": [
+          {
+            "is_correct": true,
+            "letter": "A",
+            "rationale": null,
+            "text": "Review and strengthen IAM policies"
+          },
+          {
+            "is_correct": false,
+            "letter": "B",
+            "rationale": null,
+            "text": "Delete the AWS account"
+          },
+          {
+            "is_correct": true,
+            "letter": "C",
+            "rationale": null,
+            "text": "Implement comprehensive logging"
+          },
+          {
+            "is_correct": false,
+            "letter": "D",
+            "rationale": null,
+            "text": "Disable all S3 services"
+          },
+          {
+            "is_correct": false,
+            "letter": "E",
+            "rationale": null,
+            "text": "Increase storage capacity"
+          }
+        ],
+        "correct_count": 2,
+        "explanation": "Strengthening IAM policies and implementing logging address the root causes.",
+        "question_number": 2,
+        "question_text": "Which TWO actions should be included in the remediation plan?",
+        "question_type": "MULTIPLE_SELECT"
+      }
+    ],
+    "tags": [
+      "data-breach",
+      "incident-response"
+    ],
+    "type": "CASE_STUDY"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

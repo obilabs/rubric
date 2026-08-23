@@ -1,0 +1,12 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "line": 2,
+      "message": "Invalid type 'ESSAY'. Must be one of: SINGLE_CHOICE, MULTIPLE_CHOICE, MULTIPLE_SELECT, TRUE_FALSE, HOTSPOT, DRAG_DROP, CASE_STUDY, SIMULATION",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

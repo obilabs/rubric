@@ -1,0 +1,12 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "line": 2,
+      "message": "Missing required field: 'type'",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}
