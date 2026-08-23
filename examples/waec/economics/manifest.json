@@ -1,0 +1,75 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "WAEC",
+    "slug": "waec",
+    "description": "West African Examinations Council"
+  },
+  "certification": {
+    "name": "WAEC Economics",
+    "code": "WAEC-ECON",
+    "slug": "waec-economics",
+    "description": "WASSCE Economics practice questions",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 60,
+    "passing_score": 50
+  },
+  "domains": [
+    {
+      "name": "Basic Economic Concepts and Tools",
+      "weight": 25,
+      "order": 1,
+      "description": "scarcity, choice, opportunity cost, production, division of labour, simple statistics for economics"
+    },
+    {
+      "name": "Markets, Demand and Supply",
+      "weight": 25,
+      "order": 2,
+      "description": "demand/supply, elasticity, price determination, market structures"
+    },
+    {
+      "name": "Money, Banking and Public Finance",
+      "weight": 25,
+      "order": 3,
+      "description": "money, banks, CBN, inflation, taxation, government budgets"
+    },
+    {
+      "name": "The Nigerian and International Economy",
+      "weight": 25,
+      "order": 4,
+      "description": "agriculture/industry/petroleum in Nigeria, national income, international trade, ECOWAS, development"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/basic-economic-concepts-and-tools-001.md",
+    "questions/basic-economic-concepts-and-tools-002.md",
+    "questions/basic-economic-concepts-and-tools-003.md",
+    "questions/basic-economic-concepts-and-tools-004.md",
+    "questions/basic-economic-concepts-and-tools-005.md",
+    "questions/basic-economic-concepts-and-tools-006.md",
+    "questions/basic-economic-concepts-and-tools-007.md",
+    "questions/basic-economic-concepts-and-tools-008.md",
+    "questions/basic-economic-concepts-and-tools-009.md",
+    "questions/basic-economic-concepts-and-tools-010.md",
+    "questions/basic-economic-concepts-and-tools-011.md",
+    "questions/basic-economic-concepts-and-tools-012.md",
+    "questions/basic-economic-concepts-and-tools-013.md",
+    "questions/basic-economic-concepts-and-tools-014.md",
+    "questions/basic-economic-concepts-and-tools-015.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-17T05:15:07Z",
+    "report": {
+      "Basic Economic Concepts and Tools": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0
+      }
+    },
+    "note": "AI-generated seed content — NOT real past questions. Review before presenting as exam-accurate."
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "WAEC",
+    "slug": "waec",
+    "description": "West African Examinations Council"
+  },
+  "certification": {
+    "name": "WAEC Chemistry",
+    "code": "WAEC-CHEM",
+    "slug": "waec-chemistry",
+    "description": "WASSCE Chemistry practice questions",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 60,
+    "passing_score": 50
+  },
+  "domains": [
+    {
+      "name": "Atomic Structure and Bonding",
+      "weight": 25,
+      "order": 1,
+      "description": "atoms, periodic table, chemical bonding, shapes of molecules"
+    },
+    {
+      "name": "Physical Chemistry",
+      "weight": 25,
+      "order": 2,
+      "description": "states of matter, gas laws, energetics, kinetics, equilibrium, electrochemistry"
+    },
+    {
+      "name": "Inorganic Chemistry",
+      "weight": 25,
+      "order": 3,
+      "description": "acids/bases/salts, metals and non-metals, extraction, air/water/soil chemistry"
+    },
+    {
+      "name": "Organic Chemistry",
+      "weight": 25,
+      "order": 4,
+      "description": "hydrocarbons, alkanols, alkanoic acids, polymers, petroleum, fats and oils"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/atomic-structure-and-bonding-001.md",
+    "questions/atomic-structure-and-bonding-002.md",
+    "questions/atomic-structure-and-bonding-003.md",
+    "questions/atomic-structure-and-bonding-004.md",
+    "questions/atomic-structure-and-bonding-005.md",
+    "questions/atomic-structure-and-bonding-006.md",
+    "questions/atomic-structure-and-bonding-007.md",
+    "questions/atomic-structure-and-bonding-008.md",
+    "questions/atomic-structure-and-bonding-009.md",
+    "questions/atomic-structure-and-bonding-010.md",
+    "questions/atomic-structure-and-bonding-011.md",
+    "questions/atomic-structure-and-bonding-012.md",
+    "questions/atomic-structure-and-bonding-013.md",
+    "questions/atomic-structure-and-bonding-014.md",
+    "questions/atomic-structure-and-bonding-015.md",
+    "questions/inorganic-chemistry-001.md",
+    "questions/inorganic-chemistry-002.md",
+    "questions/inorganic-chemistry-003.md",
+    "questions/inorganic-chemistry-004.md",
+    "questions/inorganic-chemistry-005.md",
+    "questions/inorganic-chemistry-006.md",
+    "questions/inorganic-chemistry-007.md",
+    "questions/inorganic-chemistry-008.md",
+    "questions/inorganic-chemistry-009.md",
+    "questions/inorganic-chemistry-010.md",
+    "questions/inorganic-chemistry-011.md",
+    "questions/inorganic-chemistry-012.md",
+    "questions/inorganic-chemistry-013.md",
+    "questions/inorganic-chemistry-014.md",
+    "questions/inorganic-chemistry-015.md",
+    "questions/organic-chemistry-001.md",
+    "questions/organic-chemistry-002.md",
+    "questions/organic-chemistry-003.md",
+    "questions/organic-chemistry-004.md",
+    "questions/organic-chemistry-005.md",
+    "questions/organic-chemistry-006.md",
+    "questions/organic-chemistry-007.md",
+    "questions/organic-chemistry-008.md",
+    "questions/organic-chemistry-009.md",
+    "questions/organic-chemistry-010.md",
+    "questions/organic-chemistry-011.md",
+    "questions/organic-chemistry-012.md",
+    "questions/organic-chemistry-013.md",
+    "questions/organic-chemistry-014.md",
+    "questions/organic-chemistry-015.md",
+    "questions/physical-chemistry-001.md",
+    "questions/physical-chemistry-002.md",
+    "questions/physical-chemistry-003.md",
+    "questions/physical-chemistry-004.md",
+    "questions/physical-chemistry-005.md",
+    "questions/physical-chemistry-006.md",
+    "questions/physical-chemistry-007.md",
+    "questions/physical-chemistry-008.md",
+    "questions/physical-chemistry-009.md",
+    "questions/physical-chemistry-010.md",
+    "questions/physical-chemistry-011.md",
+    "questions/physical-chemistry-012.md",
+    "questions/physical-chemistry-013.md",
+    "questions/physical-chemistry-014.md",
+    "questions/physical-chemistry-015.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-17T04:56:09Z",
+    "report": {
+      "Atomic Structure and Bonding": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Physical Chemistry": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Inorganic Chemistry": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Organic Chemistry": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      }
+    },
+    "note": "AI-generated seed content — NOT real past questions. Review before presenting as exam-accurate."
+  }
+}

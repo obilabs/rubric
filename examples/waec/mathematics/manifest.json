@@ -1,0 +1,139 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "WAEC",
+    "slug": "waec",
+    "description": "West African Examinations Council"
+  },
+  "certification": {
+    "name": "WAEC Mathematics (General)",
+    "code": "WAEC-MATH",
+    "slug": "waec-mathematics",
+    "description": "WASSCE Mathematics (General) practice questions",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 90,
+    "passing_score": 50
+  },
+  "domains": [
+    {
+      "name": "Number and Numeration",
+      "weight": 25,
+      "order": 1,
+      "description": "fractions, decimals, percentages, ratio, indices, logarithms, number bases, sequences"
+    },
+    {
+      "name": "Algebraic Processes",
+      "weight": 25,
+      "order": 2,
+      "description": "algebraic expressions, linear/quadratic equations, simultaneous equations, variation, inequalities, graphs"
+    },
+    {
+      "name": "Geometry and Mensuration",
+      "weight": 25,
+      "order": 3,
+      "description": "angles, triangles, circles, polygons, areas, volumes, longitude/latitude, constructions, bearings"
+    },
+    {
+      "name": "Statistics and Probability",
+      "weight": 25,
+      "order": 4,
+      "description": "data presentation, mean/median/mode, range/variance, probability of events, permutations and combinations"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/algebraic-processes-001.md",
+    "questions/algebraic-processes-002.md",
+    "questions/algebraic-processes-003.md",
+    "questions/algebraic-processes-004.md",
+    "questions/algebraic-processes-005.md",
+    "questions/algebraic-processes-006.md",
+    "questions/algebraic-processes-007.md",
+    "questions/algebraic-processes-008.md",
+    "questions/algebraic-processes-009.md",
+    "questions/algebraic-processes-010.md",
+    "questions/algebraic-processes-011.md",
+    "questions/algebraic-processes-012.md",
+    "questions/algebraic-processes-013.md",
+    "questions/algebraic-processes-014.md",
+    "questions/algebraic-processes-015.md",
+    "questions/geometry-and-mensuration-001.md",
+    "questions/geometry-and-mensuration-002.md",
+    "questions/geometry-and-mensuration-003.md",
+    "questions/geometry-and-mensuration-004.md",
+    "questions/geometry-and-mensuration-005.md",
+    "questions/geometry-and-mensuration-006.md",
+    "questions/geometry-and-mensuration-007.md",
+    "questions/geometry-and-mensuration-008.md",
+    "questions/geometry-and-mensuration-009.md",
+    "questions/geometry-and-mensuration-010.md",
+    "questions/geometry-and-mensuration-011.md",
+    "questions/geometry-and-mensuration-012.md",
+    "questions/geometry-and-mensuration-013.md",
+    "questions/geometry-and-mensuration-014.md",
+    "questions/geometry-and-mensuration-015.md",
+    "questions/number-and-numeration-001.md",
+    "questions/number-and-numeration-002.md",
+    "questions/number-and-numeration-003.md",
+    "questions/number-and-numeration-004.md",
+    "questions/number-and-numeration-005.md",
+    "questions/number-and-numeration-006.md",
+    "questions/number-and-numeration-007.md",
+    "questions/number-and-numeration-008.md",
+    "questions/number-and-numeration-009.md",
+    "questions/number-and-numeration-010.md",
+    "questions/number-and-numeration-011.md",
+    "questions/number-and-numeration-012.md",
+    "questions/number-and-numeration-013.md",
+    "questions/number-and-numeration-014.md",
+    "questions/number-and-numeration-015.md",
+    "questions/statistics-and-probability-001.md",
+    "questions/statistics-and-probability-002.md",
+    "questions/statistics-and-probability-003.md",
+    "questions/statistics-and-probability-004.md",
+    "questions/statistics-and-probability-005.md",
+    "questions/statistics-and-probability-006.md",
+    "questions/statistics-and-probability-007.md",
+    "questions/statistics-and-probability-008.md",
+    "questions/statistics-and-probability-009.md",
+    "questions/statistics-and-probability-010.md",
+    "questions/statistics-and-probability-011.md",
+    "questions/statistics-and-probability-012.md",
+    "questions/statistics-and-probability-013.md",
+    "questions/statistics-and-probability-014.md",
+    "questions/statistics-and-probability-015.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-17T04:56:04Z",
+    "report": {
+      "Number and Numeration": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Algebraic Processes": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Geometry and Mensuration": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Statistics and Probability": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0,
+        "resumed": true
+      }
+    },
+    "note": "AI-generated seed content — NOT real past questions. Review before presenting as exam-accurate."
+  }
+}

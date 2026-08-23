@@ -1,0 +1,122 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "WAEC",
+    "slug": "waec",
+    "description": "West African Examinations Council"
+  },
+  "certification": {
+    "name": "WAEC Physics",
+    "code": "WAEC-PHY",
+    "slug": "waec-physics",
+    "description": "WASSCE Physics practice questions",
+    "difficulty_level": "intermediate",
+    "exam_duration_minutes": 60,
+    "passing_score": 50
+  },
+  "domains": [
+    {
+      "name": "Mechanics",
+      "weight": 30,
+      "order": 1,
+      "description": "motion, forces, energy, machines, pressure, elasticity, projectiles"
+    },
+    {
+      "name": "Heat and Thermodynamics",
+      "weight": 20,
+      "order": 2,
+      "description": "temperature, heat transfer, gas laws, latent heat, expansion"
+    },
+    {
+      "name": "Waves, Light and Sound",
+      "weight": 25,
+      "order": 3,
+      "description": "wave properties, reflection, refraction, lenses, sound, resonance"
+    },
+    {
+      "name": "Electricity and Modern Physics",
+      "weight": 25,
+      "order": 4,
+      "description": "current, circuits, magnetism, electromagnetic induction, atomic and nuclear physics"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/electricity-and-modern-physics-001.md",
+    "questions/electricity-and-modern-physics-002.md",
+    "questions/electricity-and-modern-physics-003.md",
+    "questions/electricity-and-modern-physics-004.md",
+    "questions/electricity-and-modern-physics-005.md",
+    "questions/electricity-and-modern-physics-006.md",
+    "questions/electricity-and-modern-physics-007.md",
+    "questions/electricity-and-modern-physics-008.md",
+    "questions/electricity-and-modern-physics-009.md",
+    "questions/electricity-and-modern-physics-010.md",
+    "questions/electricity-and-modern-physics-011.md",
+    "questions/electricity-and-modern-physics-012.md",
+    "questions/electricity-and-modern-physics-013.md",
+    "questions/electricity-and-modern-physics-014.md",
+    "questions/electricity-and-modern-physics-015.md",
+    "questions/heat-and-thermodynamics-001.md",
+    "questions/heat-and-thermodynamics-002.md",
+    "questions/heat-and-thermodynamics-003.md",
+    "questions/heat-and-thermodynamics-004.md",
+    "questions/heat-and-thermodynamics-005.md",
+    "questions/heat-and-thermodynamics-006.md",
+    "questions/heat-and-thermodynamics-007.md",
+    "questions/heat-and-thermodynamics-008.md",
+    "questions/heat-and-thermodynamics-009.md",
+    "questions/heat-and-thermodynamics-010.md",
+    "questions/heat-and-thermodynamics-011.md",
+    "questions/heat-and-thermodynamics-012.md",
+    "questions/mechanics-001.md",
+    "questions/mechanics-002.md",
+    "questions/mechanics-003.md",
+    "questions/mechanics-004.md",
+    "questions/mechanics-005.md",
+    "questions/mechanics-006.md",
+    "questions/mechanics-007.md",
+    "questions/mechanics-008.md",
+    "questions/mechanics-009.md",
+    "questions/mechanics-010.md",
+    "questions/mechanics-011.md",
+    "questions/mechanics-012.md",
+    "questions/mechanics-013.md",
+    "questions/mechanics-014.md",
+    "questions/mechanics-015.md",
+    "questions/mechanics-016.md",
+    "questions/mechanics-017.md",
+    "questions/mechanics-018.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-17T04:59:13Z",
+    "report": {
+      "Mechanics": {
+        "target": 18,
+        "kept": 18,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Heat and Thermodynamics": {
+        "target": 12,
+        "kept": 12,
+        "rejected": 0,
+        "resumed": true
+      },
+      "Waves, Light and Sound": {
+        "target": 15,
+        "kept": 0,
+        "rejected": 80
+      },
+      "Electricity and Modern Physics": {
+        "target": 15,
+        "kept": 15,
+        "rejected": 0
+      }
+    },
+    "note": "AI-generated seed content — NOT real past questions. Review before presenting as exam-accurate."
+  }
+}
