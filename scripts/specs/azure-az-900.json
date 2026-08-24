@@ -1,0 +1,40 @@
+{
+  "vendor": {
+    "name": "Microsoft",
+    "slug": "microsoft",
+    "description": "Microsoft Azure cloud certifications"
+  },
+  "certification": {
+    "name": "Azure Fundamentals (AZ-900)",
+    "code": "AZ-900",
+    "slug": "azure-az-900",
+    "description": "Entry-level Microsoft Azure cloud fundamentals certification. Domain weights below follow Microsoft's published AZ-900 skills-measured outline.",
+    "difficulty_level": "beginner",
+    "exam_duration_minutes": 60,
+    "passing_score": 700
+  },
+  "default_type": "SINGLE_CHOICE",
+  "domains": [
+    {
+      "name": "Describe cloud concepts",
+      "weight": 25,
+      "type": "SINGLE_CHOICE",
+      "count": 8,
+      "hint": "cloud models (public/private/hybrid), IaaS/PaaS/SaaS, shared responsibility model, consumption-based pricing (CapEx vs OpEx), benefits of high availability, scalability, elasticity, reliability, and disaster recovery"
+    },
+    {
+      "name": "Describe Azure architecture and services",
+      "weight": 40,
+      "type": "DRAG_DROP",
+      "count": 12,
+      "hint": "regions, region pairs, availability zones, resource groups, subscriptions, management groups; matching core Azure services (Virtual Machines, App Service, Azure Functions, Blob Storage, SQL Database, Virtual Network) to the workload or description they fit"
+    },
+    {
+      "name": "Describe Azure management and governance",
+      "weight": 35,
+      "type": "SIMULATION",
+      "count": 10,
+      "hint": "Azure Policy, role-based access control (RBAC), resource locks and tags, Azure Cost Management, the correct order to create/secure/govern resources, and deploying resources safely via the portal or CLI"
+    }
+  ]
+}
