@@ -150,6 +150,33 @@ cd web && npm test    # JS ↔ Python parser + coverage parity (no dependencies)
 
 ---
 
+## Authoring at scale — generate and verify
+
+Two optional companion scripts (stdlib-only; each just needs an API key) turn a blueprint
+into a bank and then check it:
+
+- [`scripts/generate.py`](scripts/generate.py) — writes a bundle to a spec with **Gemini**,
+  validating every question through the real parser (and enforcing the per-choice / per-item
+  rationale) before it's written. Needs `GEMINI_API_KEY`.
+- [`scripts/verify.py`](scripts/verify.py) — a **cross-model accuracy check**: it blinds each
+  question (strips the answer key) and has a *different* model panel solve it cold, escalating
+  disagreements to a stronger judge, so wrong keys and ambiguous items get caught rather than
+  rubber-stamped. `--apply` drops rejects; re-run the generator with `--resume` to backfill.
+  Needs `ANTHROPIC_API_KEY`. Its blinding/comparison logic has a no-API self-test:
+  `python scripts/verify.py --self-test`.
+
+```bash
+# generate a bank to a blueprint, then cross-check it
+python scripts/generate.py --spec my-cert.json
+python scripts/verify.py examples/my-cert --apply
+```
+
+The pipeline is **generate → verify → drop → backfill**: author to the blueprint, let a second
+model catch the bad questions, remove them, and top back up. It does not replace a human
+subject-matter review — it makes one far cheaper.
+
+---
+
 ## What's in the box
 
 | Piece | Where | What it does |
