@@ -1,0 +1,97 @@
+{
+  "format": "rubric-bundle/v1",
+  "vendor": {
+    "name": "Microsoft",
+    "slug": "microsoft",
+    "description": "Microsoft Azure cloud certifications"
+  },
+  "certification": {
+    "name": "Azure Fundamentals (AZ-900)",
+    "code": "AZ-900",
+    "slug": "azure-az-900",
+    "description": "Entry-level Microsoft Azure cloud fundamentals certification. Domain weights below follow Microsoft's published AZ-900 skills-measured outline.",
+    "difficulty_level": "beginner",
+    "exam_duration_minutes": 60,
+    "passing_score": 700
+  },
+  "domains": [
+    {
+      "name": "Describe cloud concepts",
+      "weight": 25,
+      "order": 1,
+      "description": "cloud models (public/private/hybrid), IaaS/PaaS/SaaS, shared responsibility model, consumption-based pricing (CapEx vs OpEx), benefits of high availability, scalability, elasticity, reliability, and disaster recovery"
+    },
+    {
+      "name": "Describe Azure architecture and services",
+      "weight": 40,
+      "order": 2,
+      "description": "regions, region pairs, availability zones, resource groups, subscriptions, management groups; matching core Azure services (Virtual Machines, App Service, Azure Functions, Blob Storage, SQL Database, Virtual Network) to the workload or description they fit"
+    },
+    {
+      "name": "Describe Azure management and governance",
+      "weight": 35,
+      "order": 3,
+      "description": "Azure Policy, role-based access control (RBAC), resource locks and tags, Azure Cost Management, the correct order to create/secure/govern resources, and deploying resources safely via the portal or CLI"
+    }
+  ],
+  "question_defaults": {
+    "source": "ai_generated"
+  },
+  "question_files": [
+    "questions/describe-cloud-concepts-001.md",
+    "questions/describe-cloud-concepts-002.md",
+    "questions/describe-cloud-concepts-003.md",
+    "questions/describe-cloud-concepts-004.md",
+    "questions/describe-cloud-concepts-005.md",
+    "questions/describe-cloud-concepts-006.md",
+    "questions/describe-cloud-concepts-007.md",
+    "questions/describe-cloud-concepts-008.md",
+    "questions/describe-azure-architecture-and-services-001.md",
+    "questions/describe-azure-architecture-and-services-002.md",
+    "questions/describe-azure-architecture-and-services-003.md",
+    "questions/describe-azure-architecture-and-services-004.md",
+    "questions/describe-azure-architecture-and-services-005.md",
+    "questions/describe-azure-architecture-and-services-006.md",
+    "questions/describe-azure-architecture-and-services-007.md",
+    "questions/describe-azure-architecture-and-services-008.md",
+    "questions/describe-azure-architecture-and-services-009.md",
+    "questions/describe-azure-architecture-and-services-010.md",
+    "questions/describe-azure-architecture-and-services-011.md",
+    "questions/describe-azure-architecture-and-services-012.md",
+    "questions/describe-azure-management-and-governance-001.md",
+    "questions/describe-azure-management-and-governance-002.md",
+    "questions/describe-azure-management-and-governance-003.md",
+    "questions/describe-azure-management-and-governance-004.md",
+    "questions/describe-azure-management-and-governance-005.md",
+    "questions/describe-azure-management-and-governance-006.md",
+    "questions/describe-azure-management-and-governance-007.md",
+    "questions/describe-azure-management-and-governance-008.md",
+    "questions/describe-azure-management-and-governance-009.md",
+    "questions/describe-azure-management-and-governance-010.md"
+  ],
+  "generator": {
+    "model": "gemini-2.5-flash",
+    "generated_at": "2026-08-24T09:41:43Z",
+    "report": {
+      "Describe cloud concepts": {
+        "type": "SINGLE_CHOICE",
+        "target": 8,
+        "kept": 8,
+        "rejected": 0
+      },
+      "Describe Azure architecture and services": {
+        "type": "DRAG_DROP",
+        "target": 12,
+        "kept": 12,
+        "rejected": 0
+      },
+      "Describe Azure management and governance": {
+        "type": "SIMULATION",
+        "target": 10,
+        "kept": 10,
+        "rejected": 0
+      }
+    },
+    "note": "AI-generated content — NOT real past exam questions. These were written by an LLM to the published exam blueprint and should be reviewed by a subject-matter expert before use."
+  }
+}
