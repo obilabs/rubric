@@ -246,9 +246,23 @@ def verify_bank(bank_dir, panel_size, panel_model, judge_model, api_key,
     if apply and rejected:
         for r in rejected:
             os.remove(r["file"])
-        print(f"\nDeleted {len(rejected)} rejected question file(s). "
-              f"Re-run the generator with --resume to backfill to target.")
+        _prune_manifest(bank_dir)
+        print(f"\nDeleted {len(rejected)} rejected question file(s) and pruned the "
+              f"manifest. Re-run the generator with --resume to backfill to target.")
     return results
+
+
+def _prune_manifest(bank_dir):
+    """Drop question_files entries whose file no longer exists, so the bank stays
+    loadable after --apply even without a backfill run."""
+    mpath = os.path.join(bank_dir, "manifest.json")
+    with open(mpath, encoding="utf-8") as fh:
+        m = json.load(fh)
+    m["question_files"] = [q for q in m.get("question_files", [])
+                           if os.path.isfile(os.path.join(bank_dir, q))]
+    with open(mpath, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(m, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
 
 
 # --------------------------------------------------------------------------- #
