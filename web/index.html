@@ -472,6 +472,167 @@
         color: var(--wrong);
       }
 
+      /* ---- real drag-and-drop board (interactive quiz) ---- */
+      .dragboard {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .dropslot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .dropslot.home {
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--surface-2);
+        min-height: 48px;
+      }
+      .tray-label {
+        width: 100%;
+        font-size: 0.74rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .zones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .zonebox {
+        flex: 1 1 130px;
+      }
+      .zonelabel {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+        text-align: center;
+      }
+      .dropslot.zone,
+      .dropslot.slot {
+        min-height: 46px;
+        border: 1.5px dashed var(--border-strong);
+        border-radius: 10px;
+        padding: 8px 10px;
+        background: var(--surface);
+      }
+      .slots {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .slotrow {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .slotrow .order-num {
+        width: 22px;
+      }
+      .dropslot.slot {
+        flex: 1;
+      }
+      .dropslot.over {
+        border-color: var(--primary);
+        border-style: solid;
+        background: var(--primary-weak);
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        background: var(--primary-weak);
+        border: 1px solid var(--primary-weak-border);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 6px 13px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: grab;
+        user-select: none;
+        touch-action: none; /* let pointer-drag own the gesture on touch */
+      }
+      .chip:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+      }
+      .chip.selected {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary);
+      }
+      .chip.dragging {
+        opacity: 0.25;
+      }
+      .chip-ghost {
+        position: fixed;
+        z-index: 2000;
+        margin: 0;
+        pointer-events: none;
+        cursor: grabbing;
+        box-shadow: var(--shadow);
+        opacity: 0.97;
+      }
+      .dragboard.locked .chip {
+        cursor: default;
+      }
+      .chip.chip-ok {
+        background: var(--correct-bg);
+        border-color: var(--correct-border);
+        color: var(--correct);
+      }
+      .chip.chip-bad {
+        background: var(--wrong-bg);
+        border-color: var(--wrong-border);
+        color: var(--wrong);
+      }
+      .feedback {
+        margin-top: 4px;
+      }
+      .fb-row {
+        display: flex;
+        gap: 10px;
+        padding: 9px 0;
+        border-top: 1px solid var(--border);
+      }
+      .fb-row:first-child {
+        border-top: 0;
+      }
+      .fb-mark {
+        font-weight: 700;
+        flex: none;
+      }
+      .fb-row.ok .fb-mark {
+        color: var(--correct);
+      }
+      .fb-row.bad .fb-mark {
+        color: var(--wrong);
+      }
+      .fb-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .fb-line {
+        font-size: 0.92rem;
+      }
+      .fb-rat {
+        font-size: 0.86rem;
+        color: var(--muted);
+        margin-top: 3px;
+        border-left: 2px solid var(--border-strong);
+        padding-left: 10px;
+      }
+      .fb-rat.trap {
+        border-left-color: var(--wrong-border);
+      }
+      .fb-rat.trap strong {
+        color: var(--wrong);
+      }
+
       .explain {
         margin-top: 18px;
         background: var(--surface-2);
@@ -1037,37 +1198,173 @@
           });
         }
 
-        function optionSelect(labels) {
-          var sel = document.createElement("select");
-          sel.className = "assign-select";
-          sel.appendChild(new Option("— choose —", ""));
-          labels.forEach(function (t) {
-            sel.appendChild(new Option(t, t)); // Option() sets text safely
+        // ---- real drag-and-drop engine (pointer = mouse + touch; plus a
+        // tap-to-select / keyboard fallback for accessibility) ----
+        function chipEl(label) {
+          var c = el("span", "chip");
+          c.tabIndex = 0;
+          c.setAttribute("role", "button");
+          c.dataset.label = label;
+          c.innerHTML = inlineFmt(label);
+          return c;
+        }
+
+        function makeDragBoard(root) {
+          var selected = null;
+          var home = root.querySelector(".dropslot.home");
+          function locked() {
+            return root.classList.contains("locked");
+          }
+          function cap(slot) {
+            return slot.dataset.cap === "1" ? 1 : Infinity;
+          }
+          function clearSelect() {
+            if (selected) {
+              selected.classList.remove("selected");
+              selected = null;
+            }
+          }
+          function select(chip) {
+            if (selected === chip) return clearSelect();
+            clearSelect();
+            selected = chip;
+            chip.classList.add("selected");
+          }
+          function place(chip, slot) {
+            if (cap(slot) === 1) {
+              var ex = slot.querySelector(".chip");
+              if (ex && ex !== chip) home.appendChild(ex); // displace the occupant
+            }
+            slot.appendChild(chip);
+          }
+          function slotUnder(x, y) {
+            var e = document.elementFromPoint(x, y);
+            return e ? e.closest(".dropslot") : null;
+          }
+          function clearOver() {
+            root.querySelectorAll(".dropslot.over").forEach(function (n) {
+              n.classList.remove("over");
+            });
+          }
+
+          root.querySelectorAll(".chip").forEach(function (chip) {
+            chip.addEventListener("pointerdown", function (e) {
+              if (locked() || (e.button && e.button !== 0)) return;
+              var sx = e.clientX,
+                sy = e.clientY,
+                dragging = false,
+                ghost = null,
+                gx = 0,
+                gy = 0;
+              try {
+                chip.setPointerCapture(e.pointerId);
+              } catch (_) {}
+              function move(ev) {
+                if (!dragging) {
+                  if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 6) return;
+                  dragging = true;
+                  var r = chip.getBoundingClientRect();
+                  gx = sx - r.left;
+                  gy = sy - r.top;
+                  ghost = chip.cloneNode(true);
+                  ghost.classList.add("chip-ghost");
+                  ghost.style.width = r.width + "px";
+                  document.body.appendChild(ghost);
+                  chip.classList.add("dragging");
+                }
+                ghost.style.left = ev.clientX - gx + "px";
+                ghost.style.top = ev.clientY - gy + "px";
+                clearOver();
+                var s = slotUnder(ev.clientX, ev.clientY);
+                if (s) s.classList.add("over");
+              }
+              function up(ev) {
+                chip.removeEventListener("pointermove", move);
+                chip.removeEventListener("pointerup", up);
+                chip.removeEventListener("pointercancel", up);
+                clearOver();
+                if (dragging) {
+                  chip.classList.remove("dragging");
+                  if (ghost) ghost.remove();
+                  var s = slotUnder(ev.clientX, ev.clientY);
+                  if (s) place(chip, s);
+                } else {
+                  select(chip); // a tap, not a drag
+                }
+              }
+              chip.addEventListener("pointermove", move);
+              chip.addEventListener("pointerup", up);
+              chip.addEventListener("pointercancel", up);
+            });
+            chip.addEventListener("keydown", function (e) {
+              if (locked()) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                select(chip);
+              }
+            });
           });
-          return sel;
+
+          root.querySelectorAll(".dropslot").forEach(function (slot) {
+            slot.addEventListener("click", function (e) {
+              if (locked() || e.target.closest(".chip")) return;
+              if (selected) {
+                place(selected, slot);
+                clearSelect();
+              }
+            });
+            slot.tabIndex = 0;
+            slot.addEventListener("keydown", function (e) {
+              // Ignore keydowns that bubbled up from a chip inside this slot —
+              // those are the chip's own select action, not a "place here".
+              if (locked() || e.target.closest(".chip") || !selected) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                place(selected, slot);
+                clearSelect();
+              }
+            });
+          });
+
+          return {
+            lock: function () {
+              root.classList.add("locked");
+              clearSelect();
+            },
+          };
         }
 
         function renderDragDropForm(data) {
           var qd = data.question_data;
-          var zoneLabels = qd.dropzones.map(function (z) {
-            return z.text;
-          });
-          var intro = el(
-            "p",
-            "order-intro",
-            "Assign each item to a target."
+          qForm.appendChild(
+            el(
+              "p",
+              "order-intro",
+              "Drag each item into a box. (Tap an item, then tap a box, works too.)"
+            )
           );
-          qForm.appendChild(intro);
+          var board = el("div", "dragboard");
+          var tray = el("div", "dropslot home tray");
+          tray.dataset.zone = "__home";
+          tray.dataset.cap = "inf";
+          tray.appendChild(el("span", "tray-label", "Items"));
           qd.draggables.forEach(function (d) {
-            var row = el("div", "assign-row");
-            row.dataset.drag = d.text;
-            var lab = el("span", "assign-label");
-            lab.innerHTML = inlineFmt(d.text);
-            row.appendChild(lab);
-            row.appendChild(el("span", "assign-arrow", "→"));
-            row.appendChild(optionSelect(zoneLabels));
-            qForm.appendChild(row);
+            tray.appendChild(chipEl(d.text));
           });
+          board.appendChild(tray);
+          var zones = el("div", "zones");
+          qd.dropzones.forEach(function (z) {
+            var box = el("div", "zonebox");
+            box.appendChild(el("div", "zonelabel", z.text));
+            var slot = el("div", "dropslot zone");
+            slot.dataset.zone = z.text;
+            slot.dataset.cap = "inf";
+            box.appendChild(slot);
+            zones.appendChild(box);
+          });
+          board.appendChild(zones);
+          qForm.appendChild(board);
+          qForm._board = makeDragBoard(board);
         }
 
         function renderSimulationForm(data) {
@@ -1086,15 +1383,31 @@
             el(
               "p",
               "order-intro",
-              "Put the correct actions in order. Not every action belongs."
+              "Drag the correct actions into order. Not every action belongs — leave the traps in the pool."
             )
           );
+          var board = el("div", "dragboard sim");
+          var slots = el("div", "slots");
           for (var i = 0; i < qd.steps.length; i++) {
-            var row = el("div", "order-row");
-            row.appendChild(el("span", "order-num", i + 1 + "."));
-            row.appendChild(optionSelect(pool));
-            qForm.appendChild(row);
+            var slotrow = el("div", "slotrow");
+            slotrow.appendChild(el("span", "order-num", i + 1 + "."));
+            var slot = el("div", "dropslot slot");
+            slot.dataset.zone = String(i);
+            slot.dataset.cap = "1";
+            slotrow.appendChild(slot);
+            slots.appendChild(slotrow);
           }
+          board.appendChild(slots);
+          var poolEl = el("div", "dropslot home pool");
+          poolEl.dataset.zone = "__home";
+          poolEl.dataset.cap = "inf";
+          poolEl.appendChild(el("span", "tray-label", "Actions"));
+          pool.forEach(function (t) {
+            poolEl.appendChild(chipEl(t));
+          });
+          board.appendChild(poolEl);
+          qForm.appendChild(board);
+          qForm._board = makeDragBoard(board);
         }
 
         // ---- per-type grading (locks the form, reveals rationale, returns
@@ -1143,6 +1456,33 @@
           return { correct: isRight };
         }
 
+        function fbRow(ok, lineHtml, rationale, trapHtml) {
+          var row = el("div", "fb-row " + (ok ? "ok" : "bad"));
+          row.appendChild(el("span", "fb-mark", ok ? "✓" : "✗"));
+          var body = el("div", "fb-body");
+          var line = el("div", "fb-line");
+          line.innerHTML = lineHtml;
+          body.appendChild(line);
+          if (rationale) {
+            var rr = el("div", "fb-rat");
+            rr.innerHTML = inlineFmt(rationale);
+            body.appendChild(rr);
+          }
+          if (trapHtml) {
+            var tr = el("div", "fb-rat trap");
+            tr.innerHTML = trapHtml;
+            body.appendChild(tr);
+          }
+          row.appendChild(body);
+          return row;
+        }
+
+        function chipByLabel(label) {
+          return [].find.call(qForm.querySelectorAll(".chip"), function (c) {
+            return c.dataset.label === label;
+          });
+        }
+
         function gradeDragDrop(data) {
           var qd = data.question_data;
           var correctZone = {}; // draggable text -> correct dropzone ("" = none)
@@ -1155,34 +1495,40 @@
             if (!(p.draggable in rationaleFor)) rationaleFor[p.draggable] = p.rationale;
           });
 
-          var rows = qForm.querySelectorAll(".assign-row");
-          var answered = false;
-          rows.forEach(function (row) {
-            if (row.querySelector("select").value) answered = true;
+          // Read placement from the board: each chip's containing zone.
+          var placement = {};
+          var anyPlaced = false;
+          qForm.querySelectorAll(".chip").forEach(function (chip) {
+            var slot = chip.closest(".dropslot");
+            var zone = slot && slot.dataset.zone !== "__home" ? slot.dataset.zone : "";
+            placement[chip.dataset.label] = zone;
+            if (zone) anyPlaced = true;
           });
-          if (!answered) return null;
+          if (!anyPlaced) return null;
+          qForm._board.lock();
 
           var allCorrect = true;
-          rows.forEach(function (row) {
-            var drag = row.dataset.drag;
-            var sel = row.querySelector("select");
-            sel.disabled = true;
-            row.classList.add("locked");
-            var ok = sel.value === correctZone[drag];
+          var fb = el("div", "feedback");
+          qd.draggables.forEach(function (d) {
+            var label = d.text;
+            var got = placement[label] || "";
+            var ok = got === correctZone[label];
             if (!ok) allCorrect = false;
-            row.classList.add(ok ? "correct" : "chosen-wrong");
-            row.appendChild(el("span", "mark", ok ? "✓" : "✗"));
-            if (!ok) {
-              row.appendChild(
-                el(
-                  "span",
-                  "assign-correct",
-                  "→ " + (correctZone[drag] || "(leave unplaced)")
-                )
-              );
-            }
-            if (rationaleFor[drag]) attachRationale(row, null, rationaleFor[drag]);
+            var chip = chipByLabel(label);
+            if (chip) chip.classList.add(ok ? "chip-ok" : "chip-bad");
+            var line =
+              "<strong>" +
+              esc(label) +
+              "</strong> → " +
+              esc(got || "(unplaced)") +
+              (ok
+                ? ""
+                : " · correct: <strong>" +
+                  esc(correctZone[label] || "leave unplaced") +
+                  "</strong>");
+            fb.appendChild(fbRow(ok, line, rationaleFor[label], null));
           });
+          qExplain.appendChild(fb);
           return { correct: allCorrect };
         }
 
@@ -1193,30 +1539,40 @@
             distractorRat[x.text] = x.rationale;
           });
 
-          var rows = qForm.querySelectorAll(".order-row");
-          var answered = false;
-          rows.forEach(function (row) {
-            if (row.querySelector("select").value) answered = true;
+          var slots = qForm.querySelectorAll(".dropslot.slot");
+          var got = [];
+          var anyPlaced = false;
+          slots.forEach(function (slot) {
+            var chip = slot.querySelector(".chip");
+            var lab = chip ? chip.dataset.label : "";
+            got.push(lab);
+            if (lab) anyPlaced = true;
           });
-          if (!answered) return null;
+          if (!anyPlaced) return null;
+          qForm._board.lock();
 
           var allCorrect = true;
-          rows.forEach(function (row, i) {
-            var sel = row.querySelector("select");
-            sel.disabled = true;
-            row.classList.add("locked");
-            var correctText = qd.steps[i].text;
-            var ok = sel.value === correctText;
+          var fb = el("div", "feedback");
+          qd.steps.forEach(function (s, i) {
+            var correctText = s.text;
+            var placed = got[i] || "";
+            var ok = placed === correctText;
             if (!ok) allCorrect = false;
-            row.classList.add(ok ? "correct" : "chosen-wrong");
-            row.appendChild(el("span", "mark", ok ? "✓" : "✗"));
-            if (!ok) row.appendChild(el("span", "assign-correct", "→ " + correctText));
-            if (qd.steps[i].rationale) attachRationale(row, "Step " + (i + 1) + " —", qd.steps[i].rationale);
-            // If the learner placed a distractor here, explain the trap.
-            if (!ok && distractorRat[sel.value]) {
-              attachRationale(row, "Trap —", distractorRat[sel.value], "trap");
-            }
+            var chip = slots[i].querySelector(".chip");
+            if (chip) chip.classList.add(ok ? "chip-ok" : "chip-bad");
+            var line =
+              "<strong>" +
+              (i + 1) +
+              ".</strong> " +
+              esc(correctText) +
+              (ok ? "" : " · you placed: <strong>" + esc(placed || "(empty)") + "</strong>");
+            var trap =
+              !ok && distractorRat[placed]
+                ? "<strong>Trap —</strong> " + inlineFmt(distractorRat[placed])
+                : null;
+            fb.appendChild(fbRow(ok, line, s.rationale, trap));
           });
+          qExplain.appendChild(fb);
           return { correct: allCorrect };
         }
 
