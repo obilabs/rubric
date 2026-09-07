@@ -58,7 +58,9 @@ Every bundle is authored the same way, so this is additive and parallelizable.
       syntax, with per-pair rationale and reference validation. Rendered in the playground.
 - [x] `SIMULATION` — task-sequence questions: ordered `## Steps` + optional
       `## Distractors`, with per-item rationale. Rendered in the playground.
-- [ ] `HOTSPOT` — validate that referenced images exist; richer region metadata.
+- [x] `HOTSPOT` — region contract (rect / polygon / circle, fraction coordinates), validated in
+      both parsers, rendered + graded in the playground with per-region rationale.
+- [ ] `HOTSPOT` — validate that a relative `image.src` exists in the bundle.
 - [ ] Image references: alt-text and URL forms, and a resolver contract for renderers.
 
 ## Interop — meet people where they are

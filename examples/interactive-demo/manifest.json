@@ -9,7 +9,7 @@
     "name": "Interactive Types Demo",
     "code": "RUBRIC-DEMO",
     "slug": "interactive-demo",
-    "description": "A small bank showcasing the DRAG_DROP and SIMULATION question types, with per-item rationale.",
+    "description": "A small bank showcasing the DRAG_DROP, SIMULATION and HOTSPOT question types, with per-item rationale.",
     "difficulty_level": "beginner",
     "passing_score": 70
   },
@@ -34,9 +34,10 @@
     "questions/ports-and-protocols-001.md",
     "questions/ports-and-protocols-002.md",
     "questions/system-hardening-001.md",
-    "questions/system-hardening-002.md"
+    "questions/system-hardening-002.md",
+    "questions/system-hardening-003.md"
   ],
   "generator": {
-    "note": "AI-authored demo content — NOT real exam questions. It exists to exercise the DRAG_DROP and SIMULATION parsers and to show both types rendered in the playground."
+    "note": "AI-authored demo content \u2014 NOT real exam questions. It exists to exercise the DRAG_DROP, SIMULATION and HOTSPOT parsers and to show all three types rendered in the playground."
   }
 }

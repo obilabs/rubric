@@ -72,6 +72,7 @@ node web/build_examples.cjs        # if example banks changed
 
 The playground fully supports the choice-based question types (`SINGLE_CHOICE`,
 `MULTIPLE_CHOICE`, `MULTIPLE_SELECT`, `TRUE_FALSE`), which is every question in the
-bundled example banks. Math (`$…$`) is shown as source for now. `CASE_STUDY`, `HOTSPOT`,
-and the reserved `DRAG_DROP` / `SIMULATION` types parse but are not yet rendered as
-interactive items — see [`../ROADMAP.md`](../ROADMAP.md).
+bundled example banks. Math (`$…$`) is shown as source for now. `DRAG_DROP`, `SIMULATION` and `HOTSPOT` are
+rendered and graded as interactive items (a hotspot is an image with a resize-proof overlay
+in fraction coordinates); `CASE_STUDY` parses but is not yet rendered — see
+[`../ROADMAP.md`](../ROADMAP.md).

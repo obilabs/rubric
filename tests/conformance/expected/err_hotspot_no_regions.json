@@ -1,0 +1,28 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "MEDIUM",
+    "domains": [],
+    "explanation": "",
+    "question_data": {
+      "correctRegions": []
+    },
+    "question_text": "Click.",
+    "tags": [],
+    "type": "HOTSPOT"
+  },
+  "errors": [
+    {
+      "line": 8,
+      "message": "Missing hotspot image (\"image\": \"<src>\" or {\"src\": ...})",
+      "severity": "error"
+    },
+    {
+      "line": 8,
+      "message": "HOTSPOT needs at least one correct region (\"correctRegions\")",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}
