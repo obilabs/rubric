@@ -335,6 +335,10 @@ class QuestionDSLParser:
                     line=self._find_line(content, "```json"),
                     message=f"Invalid JSON in hotspot data: {str(e)}"
                 ))
+            else:
+                self._validate_hotspot_data(
+                    hotspot_data, self._find_line(content, "```json"), errors, warnings
+                )
         else:
             errors.append(ParseError(
                 line=self._find_line(content, "## Hotspots"),
@@ -351,6 +355,95 @@ class QuestionDSLParser:
             "explanation": frontmatter.get('explanation', ''),
             "question_data": hotspot_data
         }
+
+    # ------------------------------------------------------------------
+    # HOTSPOT regions — the renderer contract
+    # ------------------------------------------------------------------
+    #
+    # A region is a rect (x, y, width, height), a polygon (points: [[x, y], ...],
+    # at least 3) or a circle (cx, cy, r — r is a fraction of the image WIDTH).
+    # Coordinates are FRACTIONS of the image (0..1) so a region survives any
+    # rendered size; pixel coordinates are accepted and scaled by the image's
+    # declared width/height (or, failing that, its natural size at load — a
+    # warning, because that only works while the image file is the original).
+    # Error strings here are Rubric's own (mirrored byte-for-byte in web/rubric.js)
+    # so the conformance corpus can pin them across both parsers.
+    def _validate_hotspot_data(
+        self,
+        data: Any,
+        line: int,
+        errors: List[ParseError],
+        warnings: List[ParseError],
+    ) -> None:
+        if not isinstance(data, dict):
+            errors.append(ParseError(line=line, message="Hotspot data must be a JSON object"))
+            return
+        image = data.get("image")
+        image_src = image.get("src") if isinstance(image, dict) else image
+        if not isinstance(image_src, str) or not image_src.strip():
+            errors.append(ParseError(
+                line=line,
+                message='Missing hotspot image ("image": "<src>" or {"src": ...})'
+            ))
+        correct = data.get("correctRegions")
+        if not isinstance(correct, list) or len(correct) == 0:
+            errors.append(ParseError(
+                line=line,
+                message='HOTSPOT needs at least one correct region ("correctRegions")'
+            ))
+            correct = []
+        distractors = data.get("distractorRegions")
+        if distractors is None:
+            distractors = []
+        elif not isinstance(distractors, list):
+            errors.append(ParseError(line=line, message='"distractorRegions" must be a list'))
+            distractors = []
+
+        def is_num(v: Any) -> bool:
+            return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+        max_coord = 0.0
+        for kind, regions in (("correct", correct), ("distractor", distractors)):
+            for i, region in enumerate(regions, start=1):
+                label = f"Region {i} ({kind})"
+                if not isinstance(region, dict):
+                    errors.append(ParseError(line=line, message=f"{label}: must be an object"))
+                    continue
+                nums: List[Any] = []
+                if "points" in region:
+                    pts = region.get("points")
+                    if not isinstance(pts, list) or len(pts) < 3:
+                        errors.append(ParseError(line=line, message=f"{label}: polygon needs at least 3 points"))
+                        continue
+                    ok = all(isinstance(pt, list) and len(pt) == 2 for pt in pts)
+                    if ok:
+                        for pt in pts:
+                            nums.extend(pt)
+                    else:
+                        errors.append(ParseError(line=line, message=f"{label}: coordinates must be numbers"))
+                        continue
+                elif all(k in region for k in ("cx", "cy", "r")):
+                    nums = [region["cx"], region["cy"], region["r"]]
+                elif all(k in region for k in ("x", "y", "width", "height")):
+                    nums = [region["x"], region["y"], region["width"], region["height"]]
+                else:
+                    errors.append(ParseError(
+                        line=line,
+                        message=f"{label}: needs a rect (x, y, width, height), polygon (points) or circle (cx, cy, r)"
+                    ))
+                    continue
+                if not all(is_num(v) for v in nums):
+                    errors.append(ParseError(line=line, message=f"{label}: coordinates must be numbers"))
+                    continue
+                max_coord = max(max_coord, max(float(v) for v in nums))
+
+        declared_size = isinstance(image, dict) and is_num(image.get("width")) and is_num(image.get("height"))
+        if max_coord > 1 and not declared_size:
+            warnings.append(ParseError(
+                line=line,
+                message="Hotspot regions use pixel coordinates but the image declares no width/height; renderers scale by the image's natural size",
+                severity="warning",
+            ))
 
     def _parse_drag_drop_question(
         self,

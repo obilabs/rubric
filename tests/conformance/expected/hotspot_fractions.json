@@ -1,0 +1,62 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "EASY",
+    "domains": [
+      "System Hardening"
+    ],
+    "explanation": "Inbound rules belong at the perimeter.",
+    "question_data": {
+      "correctRegions": [
+        {
+          "height": 0.222,
+          "label": "Firewall",
+          "rationale": "First device inbound traffic reaches.",
+          "width": 0.1625,
+          "x": 0.325,
+          "y": 0.39
+        }
+      ],
+      "distractorRegions": [
+        {
+          "cx": 0.65,
+          "cy": 0.5,
+          "label": "Switch",
+          "r": 0.08,
+          "rationale": "Forwards frames; does not filter internet traffic."
+        },
+        {
+          "label": "Server",
+          "points": [
+            [
+              0.8,
+              0.14
+            ],
+            [
+              0.96,
+              0.14
+            ],
+            [
+              0.96,
+              0.33
+            ],
+            [
+              0.8,
+              0.33
+            ]
+          ]
+        }
+      ],
+      "image": {
+        "alt": "Network diagram",
+        "src": "diagram.svg"
+      }
+    },
+    "question_text": "Click the device where an inbound-block rule belongs.",
+    "tags": [],
+    "type": "HOTSPOT"
+  },
+  "errors": [],
+  "success": true,
+  "warnings": []
+}

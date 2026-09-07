@@ -524,6 +524,98 @@
     return choices;
   }
 
+  // ---- HOTSPOT regions: the renderer contract (mirror of parser._validate_hotspot_data)
+  //
+  // A region is a rect (x, y, width, height), a polygon (points, >= 3) or a
+  // circle (cx, cy, r — r is a fraction of the image WIDTH). Coordinates are
+  // FRACTIONS of the image (0..1); pixel coordinates are accepted and scaled by
+  // the image's declared width/height, else by its natural size (a warning).
+  // Error strings are byte-identical to the Python parser's.
+  function isNum(v) {
+    return typeof v === "number" && isFinite(v);
+  }
+  function validateHotspotData(data, line, errors, warnings) {
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      errors.push(err(line, "Hotspot data must be a JSON object"));
+      return;
+    }
+    var image = data.image;
+    var imageSrc = image && typeof image === "object" && !Array.isArray(image) ? image.src : image;
+    if (typeof imageSrc !== "string" || !strip(imageSrc)) {
+      errors.push(err(line, 'Missing hotspot image ("image": "<src>" or {"src": ...})'));
+    }
+    var correct = data.correctRegions;
+    if (!Array.isArray(correct) || correct.length === 0) {
+      errors.push(err(line, 'HOTSPOT needs at least one correct region ("correctRegions")'));
+      correct = [];
+    }
+    var distractors = data.distractorRegions;
+    if (distractors == null) {
+      distractors = [];
+    } else if (!Array.isArray(distractors)) {
+      errors.push(err(line, '"distractorRegions" must be a list'));
+      distractors = [];
+    }
+    var maxCoord = 0;
+    var groups = [["correct", correct], ["distractor", distractors]];
+    for (var g = 0; g < groups.length; g++) {
+      var kind = groups[g][0];
+      var regions = groups[g][1];
+      for (var i = 0; i < regions.length; i++) {
+        var region = regions[i];
+        var label = "Region " + (i + 1) + " (" + kind + ")";
+        if (!region || typeof region !== "object" || Array.isArray(region)) {
+          errors.push(err(line, label + ": must be an object"));
+          continue;
+        }
+        var nums = [];
+        if ("points" in region) {
+          var pts = region.points;
+          if (!Array.isArray(pts) || pts.length < 3) {
+            errors.push(err(line, label + ": polygon needs at least 3 points"));
+            continue;
+          }
+          var ok = pts.every(function (pt) {
+            return Array.isArray(pt) && pt.length === 2;
+          });
+          if (ok) {
+            pts.forEach(function (pt) {
+              nums.push(pt[0], pt[1]);
+            });
+          } else {
+            errors.push(err(line, label + ": coordinates must be numbers"));
+            continue;
+          }
+        } else if ("cx" in region && "cy" in region && "r" in region) {
+          nums = [region.cx, region.cy, region.r];
+        } else if ("x" in region && "y" in region && "width" in region && "height" in region) {
+          nums = [region.x, region.y, region.width, region.height];
+        } else {
+          errors.push(
+            err(line, label + ": needs a rect (x, y, width, height), polygon (points) or circle (cx, cy, r)")
+          );
+          continue;
+        }
+        if (!nums.every(isNum)) {
+          errors.push(err(line, label + ": coordinates must be numbers"));
+          continue;
+        }
+        maxCoord = Math.max(maxCoord, Math.max.apply(null, nums));
+      }
+    }
+    var declaredSize =
+      image && typeof image === "object" && !Array.isArray(image) && isNum(image.width) && isNum(image.height);
+    if (maxCoord > 1 && !declaredSize) {
+      warnings.push(
+        err(
+          line,
+          "Hotspot regions use pixel coordinates but the image declares no width/height; renderers scale by the image's natural size",
+          "warning"
+        )
+      );
+    }
+  }
+
   function parseHotspotQuestion(content, frontmatter, errors, warnings) {
     var questionText = "";
     var qMatch = /#\s+Question\s*\n([\s\S]*?)(?=##|$)/.exec(content);
@@ -533,8 +625,10 @@
     var hotspotData = {};
     var jsonMatch = /```json\s*([\s\S]*?)```/.exec(content);
     if (jsonMatch) {
+      var parsedOk = false;
       try {
         hotspotData = JSON.parse(jsonMatch[1]);
+        parsedOk = true;
       } catch (e) {
         errors.push(
           err(
@@ -542,6 +636,9 @@
             "Invalid JSON in hotspot data: " + (e && e.message)
           )
         );
+      }
+      if (parsedOk) {
+        validateHotspotData(hotspotData, findLine(content, "```json"), errors, warnings);
       }
     } else {
       errors.push(

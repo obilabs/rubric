@@ -133,3 +133,49 @@ def test_invalid_difficulty_normalized_to_medium():
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+# ---- HOTSPOT region contract (renderer contract, 2026-09) --------------------
+def _hotspot(json_block: str) -> str:
+    return (
+        "---\ntype: HOTSPOT\n---\n# Question\nClick.\n## Hotspots\n"
+        "```json\n" + json_block + "\n```\n"
+    )
+
+
+def test_hotspot_missing_image():
+    result = validate_dsl(_hotspot('{"correctRegions": [{"x": 0.1, "y": 0.1, "width": 0.2, "height": 0.2}]}'))
+    assert result.success is False
+    assert any("Missing hotspot image" in e.message for e in result.errors)
+
+
+def test_hotspot_needs_a_correct_region():
+    result = validate_dsl(_hotspot('{"image": "a.png", "correctRegions": []}'))
+    assert result.success is False
+    assert any("at least one correct region" in e.message for e in result.errors)
+
+
+def test_hotspot_region_shape_and_numbers():
+    bad_shape = validate_dsl(_hotspot('{"image": "a.png", "correctRegions": [{"label": "no coords"}]}'))
+    assert any("needs a rect" in e.message for e in bad_shape.errors)
+    bad_poly = validate_dsl(_hotspot('{"image": "a.png", "correctRegions": [{"points": [[0, 0], [1, 1]]}]}'))
+    assert any("at least 3 points" in e.message for e in bad_poly.errors)
+    bad_num = validate_dsl(_hotspot('{"image": "a.png", "correctRegions": [{"x": "0.1", "y": 0.1, "width": 0.2, "height": 0.2}]}'))
+    assert any("must be numbers" in e.message for e in bad_num.errors)
+
+
+def test_hotspot_fraction_regions_are_clean_and_pixels_warn():
+    ok = validate_dsl(_hotspot(
+        '{"image": {"src": "a.png", "alt": "diagram"}, '
+        '"correctRegions": [{"cx": 0.5, "cy": 0.5, "r": 0.1, "label": "hub"}], '
+        '"distractorRegions": [{"points": [[0, 0], [0.2, 0], [0.1, 0.2]]}]}'
+    ))
+    assert ok.success is True and ok.warnings == []
+    px = validate_dsl(_hotspot('{"image": "a.png", "correctRegions": [{"x": 250, "y": 180, "width": 100, "height": 50}]}'))
+    assert px.success is True
+    assert any("pixel coordinates" in w.message for w in px.warnings)
+    px_sized = validate_dsl(_hotspot(
+        '{"image": {"src": "a.png", "width": 800, "height": 400}, '
+        '"correctRegions": [{"x": 250, "y": 180, "width": 100, "height": 50}]}'
+    ))
+    assert px_sized.success is True and px_sized.warnings == []
