@@ -1,7 +1,7 @@
 {
   "data": {
     "choices": [],
-    "difficulty": "HARD",
+    "difficulty": "MEDIUM",
     "domains": [
       "Network Security"
     ],
@@ -10,24 +10,15 @@
       "correctRegions": [
         {
           "height": 50,
-          "label": "DMZ Interface",
+          "label": "DMZ",
           "width": 100,
           "x": 250,
           "y": 180
         }
       ],
-      "distractorRegions": [
-        {
-          "height": 50,
-          "label": "WAN Interface",
-          "width": 100,
-          "x": 250,
-          "y": 80
-        }
-      ],
       "image": "network-diagram.png"
     },
-    "question_text": "Click on the firewall interface that is configured for the DMZ network.\n\n[IMAGE: network-diagram]",
+    "question_text": "Click the DMZ interface.",
     "tags": [],
     "type": "HOTSPOT"
   },
@@ -35,7 +26,7 @@
   "success": true,
   "warnings": [
     {
-      "line": 10,
+      "line": 8,
       "message": "Hotspot regions use pixel coordinates but the image declares no width/height; renderers scale by the image's natural size",
       "severity": "warning"
     }

@@ -100,7 +100,7 @@ A `>` line before any choice is a warning and is ignored.
 | `MULTIPLE_SELECT` | `# Question` + `## Choices` | **2 or more** correct; result carries `correct_count` |
 | `TRUE_FALSE` | `# Question` + `## Choices` | exactly **2** choices |
 | `CASE_STUDY` | `# Scenario` + repeated `## Question N` (each with `### Choices`, optional `### Explanation`) | at least **1** sub-question |
-| `HOTSPOT` | `# Question` + a ` ```json ` block of `correctRegions` / `distractorRegions` | valid JSON |
+| `HOTSPOT` | `# Question` + `## Hotspots` with a ` ```json ` block: `image` + `correctRegions` (+ `distractorRegions`) | valid JSON; an image; at least one correct region; every region a rect, polygon or circle |
 | `DRAG_DROP` | `# Question` + `## Draggables` + `## Dropzones` + `## Pairs` | each pair resolves to a declared draggable and dropzone |
 | `SIMULATION` | `# Task` + ordered `## Steps` (+ optional `## Distractors`) | at least **1** step; order is significant |
 
@@ -110,6 +110,35 @@ correct choice, otherwise `SINGLE_CHOICE`.
 `MULTIPLE_CHOICE` is validated by the same rules as `SINGLE_CHOICE`, but the parser
 does **not** rewrite the type string — a `MULTIPLE_CHOICE` input still reports
 `data['type'] == 'MULTIPLE_CHOICE'`. Prefer `SINGLE_CHOICE` in new content.
+
+### HOTSPOT
+
+The renderer contract, so a bank authored once renders the same everywhere:
+
+```json
+{
+  "image": { "src": "diagram.svg", "alt": "Network diagram", "width": 800, "height": 360 },
+  "correctRegions": [
+    { "x": 0.325, "y": 0.39, "width": 0.16, "height": 0.22, "label": "Firewall",
+      "rationale": "Why this spot is right — shown when the learner finds or misses it." }
+  ],
+  "distractorRegions": [
+    { "cx": 0.5, "cy": 0.5, "r": 0.05, "label": "Switch", "rationale": "The trap, explained." },
+    { "points": [[0.8, 0.14], [0.96, 0.14], [0.96, 0.33]], "label": "Server" }
+  ]
+}
+```
+
+- **Coordinates are fractions of the image (0..1)**, so a region survives any rendered
+  size: renderers hit-test `click / renderedSize`, never pixels. A circle's `r` is a fraction of
+  the image *width*.
+- Pixel coordinates are accepted; they are scaled by the declared `image.width/height`, or —
+  with a warning — by the image's natural size at load (which only holds while the file is the
+  original).
+- Shapes: rect (`x, y, width, height`), polygon (`points`, at least 3), circle (`cx, cy, r`).
+- One correct region → the learner picks one spot; several → they must find them all.
+  A click on a distractor region reveals that region's `rationale`; a click on nothing says so.
+- `image.src` may be a URL, a relative path (resolved by the renderer), or a `data:` URI.
 
 ### DRAG_DROP
 

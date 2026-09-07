@@ -198,7 +198,7 @@ subject-matter review — it makes one far cheaper.
 | `CASE_STUDY` (scenario + nested sub-questions) | ✅ full |
 | `DRAG_DROP` (match draggables to dropzones, per-pair rationale) | ✅ full |
 | `SIMULATION` (ordered task-steps + distractors, per-step rationale) | ✅ full |
-| `HOTSPOT` (click-a-region, JSON coordinates) | ⚠️ parses; renderer is downstream |
+| `HOTSPOT` (click-a-region on an image; fraction coordinates, resize-proof) | ✅ parses + validated; rendered in the playground |
 
 See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, and [`ROADMAP.md`](ROADMAP.md) for where this is going.
 

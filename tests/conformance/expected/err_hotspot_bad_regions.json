@@ -1,0 +1,62 @@
+{
+  "data": {
+    "choices": [],
+    "difficulty": "MEDIUM",
+    "domains": [],
+    "explanation": "",
+    "question_data": {
+      "correctRegions": [
+        {
+          "label": "no coords"
+        },
+        {
+          "points": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        {
+          "height": 0.2,
+          "width": 0.2,
+          "x": "0.1",
+          "y": 0.1
+        }
+      ],
+      "distractorRegions": "nope",
+      "image": "a.png"
+    },
+    "question_text": "Click.",
+    "tags": [],
+    "type": "HOTSPOT"
+  },
+  "errors": [
+    {
+      "line": 8,
+      "message": "\"distractorRegions\" must be a list",
+      "severity": "error"
+    },
+    {
+      "line": 8,
+      "message": "Region 1 (correct): needs a rect (x, y, width, height), polygon (points) or circle (cx, cy, r)",
+      "severity": "error"
+    },
+    {
+      "line": 8,
+      "message": "Region 2 (correct): polygon needs at least 3 points",
+      "severity": "error"
+    },
+    {
+      "line": 8,
+      "message": "Region 3 (correct): coordinates must be numbers",
+      "severity": "error"
+    }
+  ],
+  "success": false,
+  "warnings": []
+}

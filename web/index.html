@@ -404,6 +404,46 @@
         color: var(--wrong);
       }
 
+      /* ---- hotspot (image + resize-proof overlay) ---- */
+      .hs-stage {
+        position: relative;
+        display: inline-block;
+        max-width: 100%;
+        line-height: 0;
+        border: 1px solid var(--border-strong);
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: crosshair;
+        user-select: none;
+      }
+      .hs-stage.locked { cursor: default; }
+      .hs-stage img { display: block; max-width: 100%; height: auto; }
+      .hs-stage svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .hs-stage svg .region { fill: transparent; stroke: transparent; }
+      .hs-stage svg .region.ok { fill: rgba(22, 163, 74, 0.22); stroke: var(--correct); stroke-width: 2; vector-effect: non-scaling-stroke; }
+      .hs-stage svg .region.bad { fill: rgba(220, 38, 38, 0.18); stroke: var(--wrong-border); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-dasharray: 4 3; }
+      .hs-stage svg .region.missed { fill: rgba(22, 163, 74, 0.10); stroke: var(--correct); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-dasharray: 4 3; }
+      .hs-marker {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        margin: -9px 0 0 -9px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        background: var(--accent, #2563eb);
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+        pointer-events: none;
+      }
+      .hs-marker.ok { background: var(--correct); }
+      .hs-marker.bad { background: var(--wrong-border); }
+      .hs-hint { color: var(--muted); font-size: 0.9rem; margin: 0 0 10px; }
+
       /* ---- drag-drop & simulation (assign / order rows) ---- */
       .order-intro {
         color: var(--muted);
@@ -932,6 +972,7 @@
             <button id="sample-choice" class="btn secondary" type="button">Single choice</button>
             <button id="sample-dragdrop" class="btn secondary" type="button">Drag &amp; drop</button>
             <button id="sample-sim" class="btn secondary" type="button">Simulation</button>
+            <button id="sample-hotspot" class="btn secondary" type="button">Hotspot</button>
           </div>
         </div>
         <div class="card">
@@ -1065,11 +1106,12 @@
             );
           }
           if (d.type === "SIMULATION") return (qd.steps || []).length > 0;
+          if (d.type === "HOTSPOT") return !!(qd.image && (qd.correctRegions || []).length > 0);
           return false;
         }
         function parsedQuestions(bank) {
           // Parse each question once; keep every successfully-parsed, answerable
-          // question (choice types, drag-drop, and simulation).
+          // question (choice types, drag-drop, simulation, and hotspot).
           return bank.questions
             .map(function (q) {
               var res = R.parse(q.text);
@@ -1170,6 +1212,7 @@
           qExplain.innerHTML = "";
           if (data.type === "DRAG_DROP") renderDragDropForm(data);
           else if (data.type === "SIMULATION") renderSimulationForm(data);
+          else if (data.type === "HOTSPOT") renderHotspotForm(data);
           else renderChoiceForm(data);
 
           submitBtn.classList.remove("hidden");
@@ -1410,6 +1453,271 @@
           qForm._board = makeDragBoard(board);
         }
 
+        // ---- HOTSPOT: image + an invisible overlay in FRACTION coordinates ----
+        //
+        // Regions are stored as fractions of the image (0..1), so hit-testing
+        // happens in that space: a click at pixel (px, py) becomes
+        // (px / renderedWidth, py / renderedHeight). Nothing depends on the
+        // rendered size, which is what makes the overlay survive any resize.
+        // Pixel-authored regions are divided by the declared (or natural)
+        // image size once, at load.
+        function hsImageOf(qd) {
+          var im = qd.image;
+          return im && typeof im === "object" ? im : { src: im, alt: "" };
+        }
+        function hsNormalize(region, w, h) {
+          // Convert a region to fraction space given the reference size (w, h);
+          // w/h of 0 means "already fractions".
+          var f = function (v, d) {
+            return d ? v / d : v;
+          };
+          if ("points" in region) {
+            return {
+              kind: "polygon",
+              points: region.points.map(function (p) {
+                return [f(p[0], w), f(p[1], h)];
+              }),
+            };
+          }
+          if ("cx" in region) {
+            return { kind: "circle", cx: f(region.cx, w), cy: f(region.cy, h), r: f(region.r, w) };
+          }
+          return {
+            kind: "rect",
+            x: f(region.x, w),
+            y: f(region.y, h),
+            w: f(region.width, w),
+            h: f(region.height, h),
+          };
+        }
+        function hsRegionsOf(qd, natural) {
+          // natural = {w, h} of the loaded image; used only for pixel-authored regions.
+          var im = hsImageOf(qd);
+          var all = (qd.correctRegions || [])
+            .map(function (r, i) {
+              return { raw: r, correct: true, idx: i };
+            })
+            .concat(
+              (qd.distractorRegions || []).map(function (r, i) {
+                return { raw: r, correct: false, idx: i };
+              })
+            );
+          var maxCoord = 0;
+          all.forEach(function (r) {
+            var nums =
+              "points" in r.raw
+                ? [].concat.apply([], r.raw.points)
+                : "cx" in r.raw
+                  ? [r.raw.cx, r.raw.cy, r.raw.r]
+                  : [r.raw.x, r.raw.y, r.raw.width, r.raw.height];
+            nums.forEach(function (n) {
+              if (typeof n === "number" && n > maxCoord) maxCoord = n;
+            });
+          });
+          var pixelSpace = maxCoord > 1;
+          var w = pixelSpace ? im.width || natural.w : 0;
+          var h = pixelSpace ? im.height || natural.h : 0;
+          return all.map(function (r) {
+            var g = hsNormalize(r.raw, w, h);
+            g.correct = r.correct;
+            g.idx = r.idx;
+            g.label = r.raw.label || "";
+            g.rationale = r.raw.rationale || "";
+            return g;
+          });
+        }
+        function hsHit(g, fx, fy, aspect) {
+          // aspect = renderedWidth / renderedHeight, so circles are round on screen.
+          if (g.kind === "rect") return fx >= g.x && fx <= g.x + g.w && fy >= g.y && fy <= g.y + g.h;
+          if (g.kind === "circle") {
+            var dx = fx - g.cx;
+            var dy = (fy - g.cy) / aspect;
+            return dx * dx + dy * dy <= g.r * g.r;
+          }
+          var inside = false;
+          var pts = g.points;
+          for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            var xi = pts[i][0], yi = pts[i][1], xj = pts[j][0], yj = pts[j][1];
+            var cross = yi > fy !== yj > fy && fx < ((xj - xi) * (fy - yi)) / (yj - yi) + xi;
+            if (cross) inside = !inside;
+          }
+          return inside;
+        }
+        function hsShape(g, aspect) {
+          var NS = "http://www.w3.org/2000/svg";
+          var n;
+          if (g.kind === "rect") {
+            n = document.createElementNS(NS, "rect");
+            n.setAttribute("x", g.x);
+            n.setAttribute("y", g.y);
+            n.setAttribute("width", g.w);
+            n.setAttribute("height", g.h);
+          } else if (g.kind === "circle") {
+            n = document.createElementNS(NS, "ellipse");
+            n.setAttribute("cx", g.cx);
+            n.setAttribute("cy", g.cy);
+            n.setAttribute("rx", g.r);
+            n.setAttribute("ry", g.r * aspect);
+          } else {
+            n = document.createElementNS(NS, "polygon");
+            n.setAttribute(
+              "points",
+              g.points
+                .map(function (p) {
+                  return p[0] + "," + p[1];
+                })
+                .join(" ")
+            );
+          }
+          n.setAttribute("class", "region");
+          return n;
+        }
+        function hsBuildStage(qd, onReady) {
+          var im = hsImageOf(qd);
+          var stage = el("div", "hs-stage");
+          var img = document.createElement("img");
+          img.alt = im.alt || "";
+          img.draggable = false;
+          var NS = "http://www.w3.org/2000/svg";
+          var svg = document.createElementNS(NS, "svg");
+          svg.setAttribute("viewBox", "0 0 1 1");
+          svg.setAttribute("preserveAspectRatio", "none");
+          stage.appendChild(img);
+          stage.appendChild(svg);
+          var st = { stage: stage, img: img, svg: svg, regions: [], shapes: [], aspect: 1 };
+          img.onload = function () {
+            st.regions = hsRegionsOf(qd, { w: img.naturalWidth, h: img.naturalHeight });
+            st.aspect = img.naturalWidth / img.naturalHeight || 1;
+            st.regions.forEach(function (g) {
+              var sh = hsShape(g, st.aspect);
+              svg.appendChild(sh);
+              st.shapes.push(sh);
+            });
+            if (onReady) onReady(st);
+          };
+          img.src = im.src;
+          return st;
+        }
+        function renderHotspotForm(data) {
+          var qd = data.question_data;
+          var multiple = (qd.correctRegions || []).length > 1;
+          qForm.appendChild(
+            el(
+              "p",
+              "hs-hint",
+              multiple
+                ? "Click every spot that applies (" + qd.correctRegions.length + "). Click a marker again to remove it."
+                : "Click the spot on the image. Click again to move it."
+            )
+          );
+          var st = hsBuildStage(qd);
+          st.clicks = []; // [{fx, fy, marker}]
+          st.stage.addEventListener("click", function (ev) {
+            if (st.locked) return;
+            var rect = st.img.getBoundingClientRect();
+            var fx = (ev.clientX - rect.left) / rect.width;
+            var fy = (ev.clientY - rect.top) / rect.height;
+            if (fx < 0 || fx > 1 || fy < 0 || fy > 1) return;
+            // A click on an existing marker removes it.
+            for (var i = 0; i < st.clicks.length; i++) {
+              var c = st.clicks[i];
+              if (Math.abs(c.fx - fx) * rect.width < 12 && Math.abs(c.fy - fy) * rect.height < 12) {
+                st.stage.removeChild(c.marker);
+                st.clicks.splice(i, 1);
+                return;
+              }
+            }
+            if (!multiple) {
+              st.clicks.forEach(function (c) {
+                st.stage.removeChild(c.marker);
+              });
+              st.clicks = [];
+            }
+            var m = el("div", "hs-marker");
+            m.style.left = fx * 100 + "%";
+            m.style.top = fy * 100 + "%";
+            st.stage.appendChild(m);
+            st.clicks.push({ fx: fx, fy: fy, marker: m });
+          });
+          qForm.appendChild(st.stage);
+          qForm._hotspot = st;
+        }
+        function gradeHotspot(data) {
+          var st = qForm._hotspot;
+          if (!st || !st.clicks.length) return null;
+          st.locked = true;
+          st.stage.classList.add("locked");
+          var hitCorrect = {};
+          var allCorrect = true;
+          var fb = el("div", "feedback");
+          st.clicks.forEach(function (c) {
+            var hit = null;
+            for (var i = 0; i < st.regions.length && !hit; i++) {
+              if (hsHit(st.regions[i], c.fx, c.fy, st.aspect)) hit = st.regions[i];
+            }
+            if (hit && hit.correct) {
+              hitCorrect[hit.idx] = true;
+              c.marker.classList.add("ok");
+            } else {
+              allCorrect = false;
+              c.marker.classList.add("bad");
+              if (hit) {
+                st.shapes[st.regions.indexOf(hit)].classList.add("bad");
+                fb.appendChild(
+                  fbRow(false, "<strong>" + esc(hit.label || "That spot") + "</strong> — a trap", hit.rationale, null)
+                );
+              } else {
+                fb.appendChild(fbRow(false, "Nothing there", "That click landed outside every region.", null));
+              }
+            }
+          });
+          st.regions.forEach(function (g, i) {
+            if (!g.correct) return;
+            var ok = !!hitCorrect[g.idx];
+            if (!ok) allCorrect = false;
+            st.shapes[i].classList.add(ok ? "ok" : "missed");
+            fb.appendChild(
+              fbRow(
+                ok,
+                "<strong>" + esc(g.label || "Region " + (g.idx + 1)) + "</strong>" + (ok ? "" : " — missed"),
+                g.rationale,
+                null
+              )
+            );
+          });
+          qExplain.appendChild(fb);
+          return { correct: allCorrect };
+        }
+        function previewHotspot(data) {
+          var qd = data.question_data;
+          var box = el("div");
+          box.appendChild(el("div", "order-intro", "Answer key — regions revealed:"));
+          var st = hsBuildStage(qd, function (s) {
+            s.regions.forEach(function (g, i) {
+              s.shapes[i].classList.add(g.correct ? "ok" : "bad");
+            });
+          });
+          st.stage.classList.add("locked");
+          box.appendChild(st.stage);
+          (qd.correctRegions || []).forEach(function (r) {
+            var row = el("div", "assign-row correct");
+            var t = el("span", "assign-label");
+            t.innerHTML = inlineFmt(r.label || "Correct region");
+            row.appendChild(t);
+            box.appendChild(row);
+            appendRat(box, r.rationale);
+          });
+          (qd.distractorRegions || []).forEach(function (r) {
+            var row = el("div", "assign-row chosen-wrong");
+            var t = el("span", "assign-label");
+            t.innerHTML = inlineFmt(r.label || "Trap region");
+            row.appendChild(t);
+            box.appendChild(row);
+            appendRat(box, r.rationale);
+          });
+          return box;
+        }
+
         // ---- per-type grading (locks the form, reveals rationale, returns
         // {correct} — or null if nothing was answered) ----
         function attachRationale(node, lead, text, tone) {
@@ -1581,6 +1889,7 @@
           var result;
           if (data.type === "DRAG_DROP") result = gradeDragDrop(data);
           else if (data.type === "SIMULATION") result = gradeSimulation(data);
+          else if (data.type === "HOTSPOT") result = gradeHotspot(data);
           else result = gradeChoice(data);
           if (!result) return; // nothing answered
 
@@ -1954,8 +2263,56 @@
         document.getElementById("sample-dragdrop").onclick = function () {
           loadSample(SAMPLE_DRAGDROP);
         };
+        var HOTSPOT_IMG =
+          "data:image/svg+xml;utf8," +
+          encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" font-family="sans-serif" font-size="20">' +
+              '<rect width="800" height="360" fill="#f6f7fb"/>' +
+              '<ellipse cx="110" cy="180" rx="80" ry="50" fill="#dbeafe" stroke="#1d4ed8" stroke-width="3"/><text x="110" y="187" text-anchor="middle">Internet</text>' +
+              '<rect x="260" y="140" width="130" height="80" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="3"/><text x="325" y="187" text-anchor="middle">Firewall</text>' +
+              '<rect x="460" y="140" width="130" height="80" rx="10" fill="#e5e7eb" stroke="#374151" stroke-width="3"/><text x="525" y="187" text-anchor="middle">Switch</text>' +
+              '<rect x="640" y="50" width="130" height="70" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="3"/><text x="705" y="92" text-anchor="middle">Server</text>' +
+              '<rect x="640" y="240" width="130" height="70" rx="10" fill="#fef9c3" stroke="#a16207" stroke-width="3"/><text x="705" y="282" text-anchor="middle">Laptop</text>' +
+              '<g stroke="#6b7280" stroke-width="3"><line x1="190" y1="180" x2="260" y2="180"/><line x1="390" y1="180" x2="460" y2="180"/><line x1="590" y1="170" x2="640" y2="90"/><line x1="590" y1="190" x2="640" y2="270"/></g>' +
+              "</svg>"
+          );
+
+        var SAMPLE_HOTSPOT =
+          "---\n" +
+          "type: HOTSPOT\n" +
+          "domains: [System Hardening]\n" +
+          "difficulty: EASY\n" +
+          "explanation: |\n" +
+          "  Inbound rules belong at the perimeter, on the device that sees traffic first.\n" +
+          "---\n" +
+          "\n" +
+          "# Question\n" +
+          "\n" +
+          "A new rule must block inbound SSH from the internet. Click the device where that rule belongs.\n" +
+          "\n" +
+          "## Hotspots\n" +
+          "\n" +
+          "```json\n" +
+          "{\n" +
+          '  "image": { "src": "' + HOTSPOT_IMG + '", "alt": "Internet, firewall, switch, server and laptop" },\n' +
+          '  "correctRegions": [\n' +
+          '    { "x": 0.325, "y": 0.39, "width": 0.1625, "height": 0.222, "label": "Firewall",\n' +
+          '      "rationale": "The perimeter firewall is the first device inbound traffic reaches — the only place a block stops it before it touches the LAN." }\n' +
+          "  ],\n" +
+          '  "distractorRegions": [\n' +
+          '    { "x": 0.575, "y": 0.39, "width": 0.1625, "height": 0.222, "label": "Switch",\n' +
+          '      "rationale": "A switch forwards frames; it is not where inbound internet traffic is filtered." },\n' +
+          '    { "x": 0.8, "y": 0.139, "width": 0.1625, "height": 0.194, "label": "Server",\n' +
+          '      "rationale": "A host firewall on the server is defence in depth, but the traffic has already crossed the perimeter." }\n' +
+          "  ]\n" +
+          "}\n" +
+          "```\n";
+
         document.getElementById("sample-sim").onclick = function () {
           loadSample(SAMPLE_SIM);
+        };
+        document.getElementById("sample-hotspot").onclick = function () {
+          loadSample(SAMPLE_HOTSPOT);
         };
 
         function runValidate() {
@@ -2075,6 +2432,7 @@
 
           if (data.type === "DRAG_DROP") box.appendChild(previewDragDrop(data));
           else if (data.type === "SIMULATION") box.appendChild(previewSimulation(data));
+          else if (data.type === "HOTSPOT") box.appendChild(previewHotspot(data));
           else if (data.choices && data.choices.length) box.appendChild(previewChoices(data));
 
           if (data.explanation) {
