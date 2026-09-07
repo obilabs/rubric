@@ -2,6 +2,8 @@
 
 **An open, git-native format for exam-prep question banks — where the unit of value is the *teaching*, not the score.**
 
+A [ObiLabs](https://obilabs.dev) project. Apache-2.0 — the format, parser, playground and generator are open; it is also the quiz engine behind training content in [Aegis](https://github.com/obilabs/aegis).
+
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 
