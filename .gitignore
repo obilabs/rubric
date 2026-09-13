@@ -26,3 +26,11 @@ npm-debug.log*
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Secrets / local env (API keys for scripts/generate.py and scripts/verify.py)
+.env
+.env.*
+!.env.example
+
+# Internal R&D notes — never tracked
+.rd_log/

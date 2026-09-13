@@ -67,11 +67,13 @@ It's Markdown in a git repo. No database, no proprietary export, no lock-in. For
 
 ## Install
 
+Rubric is not on PyPI yet (publishing as `rubric-dsl` is planned). Install it straight from GitHub:
+
 ```bash
-pip install rubric-dsl
+pip install git+https://github.com/obilabs/rubric
 ```
 
-Or from source:
+Or from a local clone, for development:
 
 ```bash
 git clone https://github.com/obilabs/rubric
@@ -127,6 +129,16 @@ Blueprint coverage - CompTIA Security+ (SY0-701)
 ```
 
 At a glance: a learner drilling this bank would be blindsided on Security Architecture and Security Program Management — 38% of the real exam, 0% of the questions. `--strict` turns that into a failing exit code for CI.
+
+---
+
+## Try it
+
+The playground runs entirely in your browser: nothing to install, no account, no server. Pick an example bank, answer a few questions, and see the rationale for the option you chose plus which domains to drill next.
+
+**https://obilabs.github.io/rubric/** (served by GitHub Pages from this repo; it forwards to [`web/`](web/), so https://obilabs.github.io/rubric/web/ works directly too)
+
+Prefer to run it locally? Open `web/index.html` from disk, or see below.
 
 ---
 
@@ -224,4 +236,6 @@ Issues and PRs welcome. Because Rubric is Apache-2.0, contributions come in unde
 
 [Apache-2.0](LICENSE). A permissive license on purpose — Rubric is meant to be embedded, forked, and built on.
 
-Rubric is an [ObiLabs](https://obilabs.dev) project.
+Rubric is an [ObiLabs](https://obilabs.dev) project. Built with AI-assisted development (Claude Code), under human direction and review.
+
+To report a security issue, see [SECURITY.md](SECURITY.md).
