@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      actions: { patterns: ["*"] }
+  - package-ecosystem: pip
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      python: { patterns: ["*"] }
+    # Majors are a scheduled pass, not something to chase mid-phase; PyYAML is
+    # deliberately held to <7 in pyproject.toml.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
