@@ -34,3 +34,6 @@ Thumbs.db
 
 # Internal R&D notes — never tracked
 .rd_log/
+
+# Per-developer Claude Code settings (the shared ones are committed)
+.claude/settings.local.json
