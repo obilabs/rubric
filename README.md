@@ -65,6 +65,21 @@ It's Markdown in a git repo. No database, no proprietary export, no lock-in. For
 
 ---
 
+## What Rubric is not
+
+The honest origin: we needed a quiz engine for [Aegis](https://github.com/obilabs/aegis), didn't want to inherit someone else's licensing terms, and didn't want it welded inside Aegis in case we need it somewhere else later. It's open source because that's the default here, not because anyone asked for it. If you're building something with a quiz inside, we hope it's useful.
+
+So, plainly:
+
+- **Not a standards-body format, and not a rival to QTI or GIFT.** Those are established, far broader, and backed by organisations. Rubric is one small format that does what we needed. If an LMS or a marking system is in your path, use the format it speaks.
+- **Not an LMS.** There are no users, no accounts, no attempts, no gradebook. It parses questions and reports coverage; everything around that is yours — see [`docs/BUILD-A-RENDERER.md`](docs/BUILD-A-RENDERER.md).
+- **Not a content library.** The banks are separate from the format, and the complete ones are private. What's in `examples/` is AI-generated seed content for exercising the parser, not study material.
+- **Not seeking adopters.** That's why the remaining items in [`ROADMAP.md`](ROADMAP.md) — importers and exporters, a GUI editor, maths rendering — are deliberately unbuilt rather than half-built. They'd be worth doing for someone who actually needs them.
+
+One difference is worth naming, because we checked it: no established format declares a syllabus's domain weights and then checks a question bank's distribution against them. Per-choice feedback is a different matter — GIFT and QTI can both attach feedback to individual answers; Rubric's contribution there is making it the default unit of a question rather than an optional extra.
+
+---
+
 ## Install
 
 Rubric is not on PyPI yet (publishing as `rubric-dsl` is planned). Install it straight from GitHub:
