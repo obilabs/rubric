@@ -130,6 +130,24 @@ Blueprint coverage - CompTIA Security+ (SY0-701)
 
 At a glance: a learner drilling this bank would be blindsided on Security Architecture and Security Program Management — 38% of the real exam, 0% of the questions. `--strict` turns that into a failing exit code for CI.
 
+Both commands take **`--json`** for a pipeline that needs the numbers rather than the table. The report is versioned (`schema_version`) and documented as a contract in [`docs/JSON-OUTPUT.md`](docs/JSON-OUTPUT.md); the human and JSON forms are two renderings of one report object, so they cannot disagree, and the exit codes are the same either way.
+
+```console
+$ rubric blueprint --json examples/comptia-security-plus/manifest.json | head -12
+{
+  "blueprint_domains": 5,
+  "command": "blueprint",
+  "domains": [
+    {
+      "actual_weight": 28.6,
+      "delta": 16.6,
+      "domain": "General Security Concepts",
+      "in_blueprint": true,
+      "question_count": 2,
+      "status": "over",
+      "target_weight": 12.0
+```
+
 ---
 
 ## Try it
@@ -161,6 +179,10 @@ The playground is powered by [`web/rubric.js`](web/rubric.js) — a **dependency
 ```bash
 cd web && npm test    # JS ↔ Python parser + coverage parity (no dependencies)
 ```
+
+### Build your own renderer
+
+Want the format in *your* UI instead? [**docs/BUILD-A-RENDERER.md**](docs/BUILD-A-RENDERER.md) is a five-minute page for someone who has never seen the project: the object shape the JavaScript parser returns for every question type, how to load it with no build step, how to grade an answer and reveal the rationale for the option the learner actually picked, how to score against the blueprint, and what a renderer must handle (missing images, maths carried as source, unknown types). It ends with a complete page you can copy, save next to `rubric.js` and open from `file://` — shipped and checked as [`web/renderer-example.html`](web/renderer-example.html).
 
 ---
 
@@ -200,6 +222,7 @@ subject-matter review — it makes one far cheaper.
 | **CLI** | `rubric validate`, `rubric blueprint` | Lint banks and report syllabus coverage |
 | **Playground** | `web/` | Zero-backend browser page: take a bank, see per-choice rationale, get a domain-by-domain diagnosis |
 | **JS port** | `web/rubric.js` | Dependency-free JavaScript parser + coverage, kept byte-for-byte in step with the Python reference by a shared conformance corpus |
+| **Docs** | `docs/` | [FORMAT](docs/FORMAT.md) (the spec), [BUILD-A-RENDERER](docs/BUILD-A-RENDERER.md) (put a bank in your own UI), [JSON-OUTPUT](docs/JSON-OUTPUT.md) (the CLI's versioned reports) |
 | **Examples** | `examples/` | 360 WAEC questions across 7 subjects + a CompTIA Security+ starter — AI-generated seed content at enough volume to exercise the parser and the coverage tool |
 
 ### Question types
@@ -214,7 +237,7 @@ subject-matter review — it makes one far cheaper.
 | `SIMULATION` (ordered task-steps + distractors, per-step rationale) | ✅ full |
 | `HOTSPOT` (click-a-region on an image; fraction coordinates, resize-proof) | ✅ parses + validated; rendered in the playground |
 
-See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, and [`ROADMAP.md`](ROADMAP.md) for where this is going.
+See [`docs/FORMAT.md`](docs/FORMAT.md) for the complete syntax reference, [`docs/BUILD-A-RENDERER.md`](docs/BUILD-A-RENDERER.md) to put a bank in your own UI, [`docs/JSON-OUTPUT.md`](docs/JSON-OUTPUT.md) for the CLI's machine-readable reports, and [`ROADMAP.md`](ROADMAP.md) for where this is going.
 
 ---
 

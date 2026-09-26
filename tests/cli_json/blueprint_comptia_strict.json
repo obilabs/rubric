@@ -1,0 +1,65 @@
+{
+  "blueprint_domains": 5,
+  "command": "blueprint",
+  "domains": [
+    {
+      "actual_weight": 28.6,
+      "delta": 16.6,
+      "domain": "General Security Concepts",
+      "in_blueprint": true,
+      "question_count": 2,
+      "status": "over",
+      "target_weight": 12.0
+    },
+    {
+      "actual_weight": 28.6,
+      "delta": 6.6,
+      "domain": "Threats, Vulnerabilities, and Mitigations",
+      "in_blueprint": true,
+      "question_count": 2,
+      "status": "ok",
+      "target_weight": 22.0
+    },
+    {
+      "actual_weight": 0.0,
+      "delta": -18.0,
+      "domain": "Security Architecture",
+      "in_blueprint": true,
+      "question_count": 0,
+      "status": "uncovered",
+      "target_weight": 18.0
+    },
+    {
+      "actual_weight": 42.9,
+      "delta": 14.9,
+      "domain": "Security Operations",
+      "in_blueprint": true,
+      "question_count": 3,
+      "status": "over",
+      "target_weight": 28.0
+    },
+    {
+      "actual_weight": 0.0,
+      "delta": -20.0,
+      "domain": "Security Program Management and Oversight",
+      "in_blueprint": true,
+      "question_count": 0,
+      "status": "uncovered",
+      "target_weight": 20.0
+    }
+  ],
+  "exit_code": 1,
+  "failures": [],
+  "format_note": null,
+  "manifest": "examples/comptia-security-plus/manifest.json",
+  "ok": false,
+  "problems": 2,
+  "questions": {
+    "failed": 0,
+    "files": 7,
+    "parsed": 7
+  },
+  "schema_version": 1,
+  "strict": true,
+  "title": "CompTIA Security+ (SY0-701)"
+}

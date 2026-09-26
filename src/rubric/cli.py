@@ -10,6 +10,11 @@ into CI or a pre-commit hook. ``blueprint`` prints the coverage table and, with
 that is under-covered or empty, or a question tagged with a domain the blueprint
 never declared — the check that keeps a bank honest against the syllabus it
 advertises.
+
+Both commands accept ``--json`` and emit the versioned report documented in
+``docs/JSON-OUTPUT.md``. The human table and the JSON are two renderings of one
+report object built in ``rubric.report``, so they cannot disagree. Exit codes are
+the same either way.
 """
 
 from __future__ import annotations
@@ -20,8 +25,24 @@ import os
 import sys
 from typing import List
 
-from .parser import QuestionDSLParser
 from .bundle import Bundle, BundleError
+from .report import (
+    build_blueprint_report,
+    build_validate_report,
+    dump_json,
+    error_report,
+    render_blueprint,
+    render_validate,
+)
+
+
+def _fail(as_json: bool, command: str, message: str, exit_code: int = 2) -> int:
+    """Report a structural failure — JSON on stdout, or a human line on stderr."""
+    if as_json:
+        print(dump_json(error_report(command, message, exit_code)))
+    else:
+        print(f"error: {message}", file=sys.stderr)
+    return exit_code
 
 
 # ---- validate --------------------------------------------------------------
@@ -41,113 +62,37 @@ def _question_files_for(path: str) -> List[str]:
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
-    parser = QuestionDSLParser()
     try:
         files = _question_files_for(args.path)
     except BundleError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 2
+        return _fail(args.json, "validate", str(exc))
 
     if not files:
-        print(f"No question files found under {args.path}", file=sys.stderr)
-        return 2
+        return _fail(args.json, "validate", f"No question files found under {args.path}")
 
-    failed = 0
-    warned = 0
-    for path in files:
-        try:
-            with open(path, "r", encoding="utf-8") as fh:
-                result = parser.parse(fh.read())
-        except OSError as exc:
-            print(f"FAIL {path}\n     could not read: {exc}")
-            failed += 1
-            continue
-
-        if not result.success:
-            failed += 1
-            print(f"FAIL {path}")
-            for err in result.errors:
-                print(f"     line {err.line}: {err.message}")
-        elif result.warnings:
-            warned += 1
-            if args.verbose:
-                print(f"WARN {path}")
-                for w in result.warnings:
-                    print(f"     line {w.line}: {w.message}")
-
-    ok = len(files) - failed
-    summary = f"\n{ok}/{len(files)} passed"
-    if warned:
-        summary += f", {warned} with warnings"
-    if failed:
-        summary += f", {failed} FAILED"
-    print(summary)
-    return 1 if failed else 0
+    report = build_validate_report(args.path, files)
+    print(dump_json(report) if args.json else render_validate(report, args.verbose))
+    return report["exit_code"]
 
 
 # ---- blueprint -------------------------------------------------------------
-
-
-_STATUS_MARK = {
-    "ok": "ok  ",
-    "under": "UNDER",
-    "over": "over",
-    "uncovered": "NONE",
-    "orphan": "ORPHAN",
-}
 
 
 def cmd_blueprint(args: argparse.Namespace) -> int:
     try:
         bundle = Bundle.load(args.manifest)
     except BundleError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 2
+        return _fail(args.json, "blueprint", str(exc))
 
-    if bundle.format_note:
-        print(f"note: {bundle.format_note}\n")
-
-    cert = bundle.manifest.get("certification", {})
-    title = cert.get("name") or bundle.manifest.get("vendor", {}).get("name") or bundle.root
-    rows = bundle.coverage()
-
-    # Percentages are computed over successfully-parsed questions only, so report
-    # that count (not the raw file count) as the denominator behind the table.
-    n_files = len(bundle.question_files)
-    n_failed = len(bundle.validate())
-    count_line = f"{n_files - n_failed} questions"
-    if n_failed:
-        count_line += f" ({n_failed} failed to parse, excluded from the percentages)"
-
-    print(f"Blueprint coverage - {title}")
-    print(f"{count_line} across {len(bundle.blueprint)} declared domains\n")
-
-    header = f"  {'domain':<34}{'target':>8}{'actual':>8}{'count':>7}{'delta':>8}  status"
-    print(header)
-    print("  " + "-" * (len(header) - 2))
-
-    problems = 0
-    for r in rows:
-        target = "-" if r.target_weight is None else f"{r.target_weight:g}%"
-        actual = f"{r.actual_weight:g}%"
-        delta = "-" if r.delta is None else f"{r.delta:+g}"
-        mark = _STATUS_MARK.get(r.status, r.status)
-        if r.status in ("under", "uncovered", "orphan"):
-            problems += 1
-        print(f"  {r.domain[:34]:<34}{target:>8}{actual:>8}{r.question_count:>7}{delta:>8}  {mark}")
-
-    print()
-    if problems:
-        print(f"{problems} domain(s) need attention (under-covered, empty, or off-blueprint).")
-    else:
-        print("Every blueprint domain is represented within tolerance.")
-
-    if args.strict and problems:
-        return 1
-    return 0
+    report = build_blueprint_report(bundle, strict=args.strict)
+    print(dump_json(report) if args.json else render_blueprint(report))
+    return report["exit_code"]
 
 
 # ---- entrypoint ------------------------------------------------------------
+
+
+_JSON_HELP = "emit the versioned machine-readable report (see docs/JSON-OUTPUT.md)"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -160,6 +105,7 @@ def build_parser() -> argparse.ArgumentParser:
     v = sub.add_parser("validate", help="lint a question file, directory, or bundle manifest")
     v.add_argument("path", help="a .md question, a directory, or a manifest.json")
     v.add_argument("-v", "--verbose", action="store_true", help="also print warnings")
+    v.add_argument("--json", action="store_true", help=_JSON_HELP)
     v.set_defaults(func=cmd_validate)
 
     b = sub.add_parser("blueprint", help="report domain coverage against a bundle manifest")
@@ -169,6 +115,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="exit non-zero if any domain needs attention (under-covered, empty, or off-blueprint)",
     )
+    b.add_argument("--json", action="store_true", help=_JSON_HELP)
     b.set_defaults(func=cmd_blueprint)
 
     return p

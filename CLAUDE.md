@@ -16,6 +16,8 @@ Aegis. Read `README.md` (what and why), `docs/FORMAT.md` (the spec) and
   implementations must agree on.
 - `examples/`: example corpora; each `manifest.json` must pass `rubric validate`.
 - `scripts/`: `generate.py`, `verify.py` and the authoring specs.
+- `docs/`: `FORMAT.md` (the spec), `JSON-OUTPUT.md` (the CLI's versioned `--json`
+  contract) and `BUILD-A-RENDERER.md` (the adopter guide to the JS parser).
 
 ## Rules
 
@@ -25,7 +27,13 @@ Aegis. Read `README.md` (what and why), `docs/FORMAT.md` (the spec) and
   port and the conformance fixtures in the same pull request.
 - The format is public and other people's banks depend on it: a breaking change
   to the frontmatter or the bundle manifest needs a version bump and a note in
-  `ROADMAP.md`, never a silent redefinition.
+  `ROADMAP.md`, never a silent redefinition. The same applies to the CLI's
+  `--json` reports: `schema_version` bumps on any breaking change, and the golden
+  fixtures in `tests/cli_json/` are regenerated deliberately, never to make a
+  test pass.
+- Human and JSON CLI output are two renderings of one report object built in
+  `src/rubric/report.py`. Keep it that way — a second code path is how the two
+  start to disagree.
 - Keep the dependency list at one. New runtime dependencies need a reason that
   survives "someone will install this to parse a Markdown file".
 - Question *content* lives in the private `obilabs/rubric-banks` repo. Only
