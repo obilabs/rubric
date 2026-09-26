@@ -22,6 +22,7 @@ python -m http.server 8099      # then open http://localhost:8099
 | `rubric.js` | A **dependency-free JavaScript port** of the parser in `src/rubric/parser.py` plus the coverage math from `bundle.py`. Loads as a browser global (`window.Rubric`) and as a Node CommonJS module (for the tests). |
 | `examples.bundle.js` | The example banks in `../examples/`, inlined so the page needs zero `fetch` (works from `file://`). **Generated — do not edit.** |
 | `build_examples.cjs` | Regenerates `examples.bundle.js` from `../examples/`. |
+| `renderer-example.html` | The smallest renderer that does the point of the format: parse, grade, show the rationale for the option *you* picked. Open it from `file://`. Walked through in [`../docs/BUILD-A-RENDERER.md`](../docs/BUILD-A-RENDERER.md). |
 | `test/` | Parity tests that prove the JS port matches the Python reference. |
 
 ## Why a JavaScript port (and not an API, or WASM)

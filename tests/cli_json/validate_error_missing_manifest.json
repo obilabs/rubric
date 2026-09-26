@@ -1,0 +1,7 @@
+{
+  "command": "validate",
+  "error": "Manifest not found: tests/cli_json/inputs/absent/manifest.json",
+  "exit_code": 2,
+  "ok": false,
+  "schema_version": 1
+}

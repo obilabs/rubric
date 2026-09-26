@@ -1,0 +1,56 @@
+{
+  "blueprint_domains": 4,
+  "command": "blueprint",
+  "domains": [
+    {
+      "actual_weight": 25.0,
+      "delta": 0.0,
+      "domain": "Number and Numeration",
+      "in_blueprint": true,
+      "question_count": 15,
+      "status": "ok",
+      "target_weight": 25.0
+    },
+    {
+      "actual_weight": 25.0,
+      "delta": 0.0,
+      "domain": "Algebraic Processes",
+      "in_blueprint": true,
+      "question_count": 15,
+      "status": "ok",
+      "target_weight": 25.0
+    },
+    {
+      "actual_weight": 25.0,
+      "delta": 0.0,
+      "domain": "Geometry and Mensuration",
+      "in_blueprint": true,
+      "question_count": 15,
+      "status": "ok",
+      "target_weight": 25.0
+    },
+    {
+      "actual_weight": 25.0,
+      "delta": 0.0,
+      "domain": "Statistics and Probability",
+      "in_blueprint": true,
+      "question_count": 15,
+      "status": "ok",
+      "target_weight": 25.0
+    }
+  ],
+  "exit_code": 0,
+  "failures": [],
+  "format_note": null,
+  "manifest": "examples/waec/mathematics/manifest.json",
+  "ok": true,
+  "problems": 0,
+  "questions": {
+    "failed": 0,
+    "files": 60,
+    "parsed": 60
+  },
+  "schema_version": 1,
+  "strict": false,
+  "title": "WAEC Mathematics (General)"
+}

@@ -1,0 +1,50 @@
+{
+  "command": "validate",
+  "exit_code": 1,
+  "files": [
+    {
+      "errors": [
+        {
+          "line": 0,
+          "message": "Missing '## Choices' section",
+          "severity": "error"
+        },
+        {
+          "line": 0,
+          "message": "SINGLE_CHOICE must have exactly 1 correct answer, found 0",
+          "severity": "error"
+        }
+      ],
+      "path": "tests/cli_json/inputs/broken.md",
+      "status": "fail",
+      "warnings": []
+    },
+    {
+      "errors": [],
+      "path": "tests/cli_json/inputs/clean.md",
+      "status": "pass",
+      "warnings": []
+    },
+    {
+      "errors": [],
+      "path": "tests/cli_json/inputs/ok-with-warning.md",
+      "status": "warn",
+      "warnings": [
+        {
+          "line": 2,
+          "message": "Invalid difficulty 'TRICKY'. Defaulting to MEDIUM",
+          "severity": "warning"
+        }
+      ]
+    }
+  ],
+  "ok": false,
+  "schema_version": 1,
+  "summary": {
+    "failed": 1,
+    "passed": 2,
+    "total": 3,
+    "warned": 1
+  },
+  "target": "tests/cli_json/inputs"
+}

@@ -1,0 +1,45 @@
+{
+  "command": "validate",
+  "exit_code": 0,
+  "files": [
+    {
+      "errors": [],
+      "path": "examples/interactive-demo/questions/ports-and-protocols-001.md",
+      "status": "pass",
+      "warnings": []
+    },
+    {
+      "errors": [],
+      "path": "examples/interactive-demo/questions/ports-and-protocols-002.md",
+      "status": "pass",
+      "warnings": []
+    },
+    {
+      "errors": [],
+      "path": "examples/interactive-demo/questions/system-hardening-001.md",
+      "status": "pass",
+      "warnings": []
+    },
+    {
+      "errors": [],
+      "path": "examples/interactive-demo/questions/system-hardening-002.md",
+      "status": "pass",
+      "warnings": []
+    },
+    {
+      "errors": [],
+      "path": "examples/interactive-demo/questions/system-hardening-003.md",
+      "status": "pass",
+      "warnings": []
+    }
+  ],
+  "ok": true,
+  "schema_version": 1,
+  "summary": {
+    "failed": 0,
+    "passed": 5,
+    "total": 5,
+    "warned": 0
+  },
+  "target": "examples/interactive-demo/manifest.json"
+}
