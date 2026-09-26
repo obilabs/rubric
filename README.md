@@ -45,7 +45,7 @@ Rubric exists because three things that matter most for *exam preparation* are u
 
 ### 1. The rationale is a first-class citizen — per **choice**
 
-Some formats *can* attach feedback to individual answers — GIFT and QTI among them — but it's an optional extra that's easy to skip and usually skipped. Rubric makes the per-choice rationale the default unit of a question, because a learner didn't get it wrong in the abstract — they picked **B**, for a specific reason. A distractor *is* a misconception, and the `>` rationale line addresses the mistake the learner actually made:
+Several formats *can* attach feedback to an individual answer: GIFT and `text2qti` both do it natively, and QTI can express it. In those formats it's something you add to a question; in Rubric it's the unit the question is made of. Rubric makes the per-choice rationale the default unit of a question, because a learner didn't get it wrong in the abstract — they picked **B**, for a specific reason. A distractor *is* a misconception, and the `>` rationale line addresses the mistake the learner actually made:
 
 ```markdown
 B. Oxygen
@@ -62,6 +62,28 @@ A real exam isn't a flat pile of questions; it's a weighted distribution across 
 ### 3. The bank is **yours** — git-native, no lock-in
 
 It's Markdown in a git repo. No database, no proprietary export, no lock-in. Fork it, diff it, review it in a PR, and take it with you.
+
+### Why build one rather than borrow one
+
+QTI, GIFT and `text2qti` were all on the table, and each of them is better than Rubric at things that matter.
+
+- **QTI** (1EdTech) is the interoperability standard. Version 3.0 defines twenty-one interaction types, including typed text, numerical entry, extended text, inline choice, gap match, sliders, media, drawing and file upload, plus a custom-interaction hook for the ones nobody has specified yet. Import and export exists across LMS and assessment platforms, which is the whole point of a standard.
+- **GIFT** is Moodle's plain-text import format: nine question types, per-answer feedback written directly in the syntax, and a bank that lands in Moodle with no toolchain at all.
+- **`text2qti`** authors in Markdown-ish text and builds a QTI package (Canvas is its target): seven question types with per-choice feedback, and — unlike Rubric — short answer, numerical, essay and file upload.
+
+Rubric has none of that breadth. It declares seven types across four interaction families, and it accepts **no typed input of any kind** — no short answer, no numerical, no essay. It is a selected-response format: narrower than GIFT and `text2qti` on input types, and far narrower than QTI on everything.
+
+So the reason for a new one was not that those were lacking. It was:
+
+1. **The engine was needed inside [Aegis](https://github.com/obilabs/aegis)** — a small thing to embed in a product, not a standard to conform to.
+2. **A format arrives with its licensing terms and its toolchain attached.** Borrowing the format means borrowing both, and in QTI's case the toolchain is XML in a zip with a manifest.
+3. **The two things this actually had to do are not what those formats optimise for**: checking a bank's distribution against a declared syllabus, and carrying a rationale as the default unit of every question — and of each pair, step and region in `DRAG_DROP`, `SIMULATION` and `HOTSPOT`.
+
+Of those two, only the blueprint check is genuinely absent elsewhere, and we went and looked: no established format declares a syllabus's domain weights and then reports a bank's distribution against them. The weighting these formats do carry is for scoring an attempt or for selecting which questions to serve, not for asking whether the bank matches the exam. Per-choice feedback is not ours to claim — making it the default is.
+
+Plain text is an improvement on a zipped XML package, but GIFT and `text2qti` are plain text too, so that is not the edge either. The difference there is granularity: one question per file plus a repo-level manifest, so a diff is per question and so is a review.
+
+And the practical version, if you are choosing a format rather than reading about ours: **if an LMS, a marking system, or an item bank you don't control is anywhere in your path, author in the format that thing already speaks.** Getting a bank out of Rubric and into one of them is on the roadmap, not in the box.
 
 ---
 
