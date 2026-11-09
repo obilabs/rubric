@@ -7,6 +7,8 @@ A [ObiLabs](https://obilabs.dev) project. Apache-2.0 — the format, parser, pla
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](pyproject.toml)
 
+[![CI](https://github.com/obilabs/rubric/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/obilabs/rubric/actions/workflows/ci.yml)
+
 A Rubric question is a plain Markdown file: YAML frontmatter for metadata, a Markdown body for the prompt and choices. It reads like something a teacher would write, diffs cleanly in a pull request, and parses into structured data with a single dependency (PyYAML).
 
 ```markdown
