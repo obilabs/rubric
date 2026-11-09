@@ -1,0 +1,176 @@
+<!doctype html>
+<!--
+  The worked example from docs/BUILD-A-RENDERER.md: the smallest renderer that
+  does the thing Rubric exists for — grade an answer and show the rationale for
+  the option the learner actually picked.
+
+  No build step, no dependencies, no server. Open this file from disk.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rubric — minimal renderer</title>
+    <style>
+      body { font: 16px/1.5 system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; }
+      .choice { display: block; margin: .4rem 0; }
+      .rationale { margin: .2rem 0 .8rem 1.6rem; color: #444; border-left: 3px solid #ccc; padding-left: .6rem; }
+      .correct { color: #0a6; font-weight: 600; }
+      .wrong { color: #c33; font-weight: 600; }
+      .unsupported { background: #fff8e1; border: 1px solid #e6c34a; padding: .8rem; }
+      button { font: inherit; padding: .4rem .9rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Rubric — minimal renderer</h1>
+    <div id="app"></div>
+
+    <script src="rubric.js"></script>
+    <script>
+      // A bank is Markdown files. Here two of them are inlined as strings so the
+      // page works from file:// with no fetch.
+      var QUESTIONS = [
+        [
+          "---",
+          "type: SINGLE_CHOICE",
+          "domains: [Number and Numeration]",
+          "difficulty: EASY",
+          "explanation: |",
+          "  Three-fifths of 200 is (3 / 5) * 200 = 120.",
+          "---",
+          "",
+          "# Question",
+          "",
+          "A farmer harvests 200 mangoes and sells three-fifths of them.",
+          "How many does she sell?",
+          "",
+          "## Choices",
+          "",
+          "A. 120 *[CORRECT]*",
+          "> (3 / 5) * 200 = 120. \"Three-fifths of 200\" is the fraction times the whole.",
+          "B. 40",
+          "> This is one-fifth of 200 - you found one part but forgot the 3.",
+          "C. 60",
+          "> You divided 200 by 5 and then stopped.",
+          "D. 333",
+          "> You divided by the fraction instead of multiplying by it.",
+        ].join("\n"),
+        [
+          "---",
+          "type: DRAG_DROP",
+          "domains: [Ports and Protocols]",
+          "explanation: These are the IANA well-known default ports.",
+          "---",
+          "",
+          "# Question",
+          "",
+          "Match each protocol to its default port.",
+          "",
+          "## Draggables",
+          "",
+          "- HTTP",
+          "- SSH",
+          "",
+          "## Dropzones",
+          "",
+          "- 80",
+          "- 22",
+          "",
+          "## Pairs",
+          "",
+          "- HTTP -> 80",
+          "> Unencrypted web traffic uses port 80.",
+          "- SSH -> 22",
+        ].join("\n"),
+      ];
+
+      var app = document.getElementById("app");
+
+      // Math is carried as TeX source between $...$ and images as a literal
+      // [IMAGE: name] marker. A renderer that does neither must still not break:
+      // escape and show the source rather than dropping the text.
+      function escapeHtml(s) {
+        return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+        });
+      }
+
+      // The types this renderer claims to handle. Everything else — including a
+      // type added to the format after this page was written — degrades to the
+      // prompt plus the explanation, which is still useful to a learner.
+      var HANDLED = { SINGLE_CHOICE: 1, MULTIPLE_CHOICE: 1, TRUE_FALSE: 1 };
+
+      QUESTIONS.forEach(function (dsl, i) {
+        var result = Rubric.parse(dsl);
+
+        var box = document.createElement("section");
+        app.appendChild(box);
+
+        // Never render an unvalidated question: a bank is someone else's file.
+        if (!result.success) {
+          box.innerHTML =
+            '<p class="unsupported">Question ' + (i + 1) + " could not be parsed: " +
+            escapeHtml(result.errors.map(function (e) { return e.message; }).join("; ")) +
+            "</p>";
+          return;
+        }
+
+        var q = result.data;
+        box.innerHTML = "<h2>Question " + (i + 1) + "</h2><p>" + escapeHtml(q.question_text) + "</p>";
+
+        if (!HANDLED[q.type]) {
+          box.innerHTML +=
+            '<p class="unsupported">This renderer does not handle <code>' +
+            escapeHtml(q.type) + "</code> yet. " +
+            escapeHtml(q.explanation || "") + "</p>";
+          return;
+        }
+
+        var form = document.createElement("div");
+        q.choices.forEach(function (c) {
+          var id = "q" + i + c.letter;
+          form.innerHTML +=
+            '<label class="choice"><input type="radio" name="q' + i + '" value="' +
+            c.letter + '" id="' + id + '"> ' + c.letter + ". " + escapeHtml(c.text) + "</label>";
+        });
+        box.appendChild(form);
+
+        var btn = document.createElement("button");
+        btn.textContent = "Check answer";
+        box.appendChild(btn);
+
+        var out = document.createElement("div");
+        out.id = "out" + i;
+        box.appendChild(out);
+
+        btn.onclick = function () {
+          var picked = box.querySelector('input[name="q' + i + '"]:checked');
+          if (!picked) { out.textContent = "Pick an option first."; return; }
+
+          // Grading is a property of the data, not of the renderer: the chosen
+          // choice's own is_correct flag is the whole answer key.
+          var choice = q.choices.filter(function (c) { return c.letter === picked.value; })[0];
+          var html = choice.is_correct
+            ? '<p class="correct">Correct.</p>'
+            : '<p class="wrong">Not quite.</p>';
+
+          // The payload: the rationale for the option THIS learner picked.
+          if (choice.rationale) {
+            html += '<p class="rationale"><strong>Why ' + choice.letter + ":</strong> " +
+              escapeHtml(choice.rationale) + "</p>";
+          }
+          if (!choice.is_correct) {
+            var right = q.choices.filter(function (c) { return c.is_correct; })[0];
+            html += "<p>The answer is " + right.letter + ". " + escapeHtml(right.text) + "</p>";
+            if (right.rationale) {
+              html += '<p class="rationale">' + escapeHtml(right.rationale) + "</p>";
+            }
+          }
+          if (q.explanation) {
+            html += "<p><em>" + escapeHtml(q.explanation) + "</em></p>";
+          }
+          out.innerHTML = html;
+        };
+      });
+    </script>
+  </body>
+</html>

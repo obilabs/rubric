@@ -288,6 +288,11 @@ On success, `data` for a choice question looks like:
 `CASE_STUDY` adds a `sub_questions` list; `HOTSPOT` puts its regions in
 `question_data`; `MULTIPLE_SELECT` adds a top-level `correct_count`.
 
+The JavaScript port returns the same structure. If you are building a UI on it,
+[`BUILD-A-RENDERER.md`](BUILD-A-RENDERER.md) gives the object shape per type, grading,
+and a working page; [`JSON-OUTPUT.md`](JSON-OUTPUT.md) documents the CLI's versioned
+machine-readable reports.
+
 ---
 
 ## 5. Bundles and the blueprint
